@@ -1,0 +1,20 @@
+
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: bvom-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: bvom
+      MYSQL_USER: bvom_user
+      MYSQL_PASSWORD: bvom_pass
+      MYSQL_ROOT_PASSWORD: root_pass_change_me
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
