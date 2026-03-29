@@ -48,8 +48,7 @@ router.get("/modules/:id", async (req, res, next) => {
 
     const rows = await query(
       `
-      SELECT id, theme_id AS themeId, title, summary, body, video_url AS videoUrl,
-             challenge_text AS challengeText, sort_order AS sortOrder, published
+      SELECT id, theme_id AS themeId, title, summary, body, video_url AS videoUrl, challenge_text AS challengeText, sort_order AS sortOrder, published
       FROM modules
       WHERE id = :moduleId AND published = 1
       LIMIT 1
