@@ -11,6 +11,7 @@ import { publicLimiter } from "./middleware/rateLimit.js";
 
 import healthRoutes from "./routes/health.js";
 import publicContentRoutes from "./routes/public.content.js";
+import publicSurveyRoutes from "./routes/public.surveys.js";
 import adminAuthRoutes from "./routes/admin.auth.js";
 
 const app = express();
@@ -53,6 +54,7 @@ app.use(publicLimiter);
 
 app.use(healthRoutes);
 app.use("/api/content", publicContentRoutes);
+app.use("/api/surveys", publicSurveyRoutes);
 app.use("/api/admin", adminAuthRoutes);
 
 app.use((req, res) => {
