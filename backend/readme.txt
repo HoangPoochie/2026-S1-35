@@ -14,6 +14,10 @@ GET /api/content/themes
 GET /api/content/themes/:id/modules
 GET /api/content/modules/:id
 GET /api/surveys/:surveyId
+POST /api/surveys/:surveyId/submissions
 POST /api/admin/login
 POST /api/admin/logout
 GET /api/admin/me
+GET/POST/PUT /api/admin/themes
+GET/POST/PUT /api/admin/modules
+GET /api/admin/reports/surveys/:surveyId/summary
