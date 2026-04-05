@@ -83,7 +83,7 @@ const BVM_DATA = {
         {
           type: "learning",
           heading: "What We Learned",
-          body: "Self-compassion isn't about being 'soft' or making excuses. It's about treating yourself the way you'd treat a friend. Building self-compassion helps with resilience, emotional awareness, and bouncing back from mistakes.",
+          body: "Self-compassion isn't about being "soft" or making excuses. It's about treating yourself the way you'd treat a friend. Building self-compassion helps with resilience, emotional awareness, and bouncing back from mistakes.",
           note: null
         }
       ]
