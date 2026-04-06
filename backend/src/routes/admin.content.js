@@ -19,7 +19,11 @@ const moduleSchema = z.object({
   title: z.string().trim().min(1).max(255),
   summary: z.string().trim().max(5000).optional().default(""),
   body: z.string().trim().max(50000).optional().default(""),
-  videoUrl: z.string().trim().max(500).optional().default(""),
+  imageUrl: z.string().trim().max(500).optional().default(""),
+  imageAltText: z.string().trim().max(255).optional().default(""),
+  // If stored locally like this: /uploads/images/example.png, annocate the current using videoUrl, and use the annocated videoUrl.
+  // videoUrl: z.string().trim().max(500).optional().default(""),
+  videoUrl: z.union([z.string().trim().url().max(500), z.literal("")]).optional().default(""),
   challengeText: z.string().trim().max(5000).optional().default(""),
   sortOrder: z.number().int().min(0).default(0),
   published: z.boolean().default(false)
@@ -91,8 +95,13 @@ router.get("/modules", async (req, res, next) => {
   try {
     const rows = await query(
       `
-      SELECT id, theme_id AS themeId, title, summary, body, video_url AS videoUrl,
-             challenge_text AS challengeText, sort_order AS sortOrder, published
+      SELECT id, theme_id AS themeId, title, summary, body,
+        image_url AS imageUrl,
+        image_alt_text AS imageAltText,
+        video_url AS videoUrl,
+        challenge_text AS challengeText,
+        sort_order AS sortOrder,
+        published
       FROM modules
       ORDER BY theme_id ASC, sort_order ASC, id ASC
       `
@@ -109,10 +118,12 @@ router.post("/modules", validate(moduleSchema), async (req, res, next) => {
     const result = await execute(
       `
       INSERT INTO modules (
-        theme_id, title, summary, body, video_url, challenge_text, sort_order, published
+        theme_id, title, summary, body, image_url, image_alt_text, video_url,
+        challenge_text, sort_order, published
       )
       VALUES (
-        :themeId, :title, :summary, :body, :videoUrl, :challengeText, :sortOrder, :published
+        :themeId, :title, :summary, :body, :imageUrl, :imageAltText, :videoUrl,
+        :challengeText, :sortOrder, :published
       )
       `,
       req.body
@@ -135,13 +146,15 @@ router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
       `
       UPDATE modules
       SET theme_id = :themeId,
-          title = :title,
-          summary = :summary,
-          body = :body,
-          video_url = :videoUrl,
-          challenge_text = :challengeText,
-          sort_order = :sortOrder,
-          published = :published
+        title = :title,
+        summary = :summary,
+        body = :body,
+        image_url = :imageUrl,
+        image_alt_text = :imageAltText,
+        video_url = :videoUrl,
+        challenge_text = :challengeText,
+        sort_order = :sortOrder,
+        published = :published
       WHERE id = :id
       `,
       { id, ...req.body }

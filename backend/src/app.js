@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import session from "express-session";
 import morgan from "morgan";
+import path from "path";
 
 import env from "./config/env.js";
 import logger from "./utils/logger.js";
@@ -15,6 +16,7 @@ import publicSurveyRoutes from "./routes/public.surveys.js";
 import adminAuthRoutes from "./routes/admin.auth.js";
 import adminContentRoutes from "./routes/admin.content.js";
 import adminReportRoutes from "./routes/admin.reports.js";
+import adminUploadRoutes from "./routes/admin.uploads.js";
 
 const app = express();
 
@@ -54,12 +56,15 @@ app.use(
 
 app.use(publicLimiter);
 
+app.use("/uploads", express.static(path.join(process.cwd(), env.UPLOAD_DIR)));
+
 app.use(healthRoutes);
 app.use("/api/content", publicContentRoutes);
 app.use("/api/surveys", publicSurveyRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin", adminContentRoutes);
 app.use("/api/admin/reports", adminReportRoutes);
+app.use("/api/admin", adminUploadRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

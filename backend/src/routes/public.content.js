@@ -27,8 +27,12 @@ router.get("/themes/:id/modules", async (req, res, next) => {
 
     const rows = await query(
       `
-      SELECT id, theme_id AS themeId, title, summary, video_url AS videoUrl,
-             challenge_text AS challengeText, sort_order AS sortOrder
+      SELECT id, theme_id AS themeId, title, summary,
+        image_url AS imageUrl,
+        image_alt_text AS imageAltText,
+        video_url AS videoUrl,
+        challenge_text AS challengeText,
+        sort_order AS sortOrder
       FROM modules
       WHERE published = 1 AND theme_id = :themeId
       ORDER BY sort_order ASC, id ASC
@@ -48,8 +52,13 @@ router.get("/modules/:id", async (req, res, next) => {
 
     const rows = await query(
       `
-      SELECT id, theme_id AS themeId, title, summary, body, video_url AS videoUrl, 
-          challenge_text AS challengeText, sort_order AS sortOrder, published
+      SELECT id, theme_id AS themeId, title, summary, body,
+        image_url AS imageUrl,
+        image_alt_text AS imageAltText,
+        video_url AS videoUrl,
+        challenge_text AS challengeText,
+        sort_order AS sortOrder,
+        published
       FROM modules
       WHERE id = :moduleId AND published = 1
       LIMIT 1

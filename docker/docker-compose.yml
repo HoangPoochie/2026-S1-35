@@ -1,5 +1,5 @@
 
-version: "3.9"
+# version: "3.9"
 
 services:
   mysql:
@@ -12,7 +12,7 @@ services:
       MYSQL_PASSWORD: bvom_pass
       MYSQL_ROOT_PASSWORD: root_pass_change_me
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
