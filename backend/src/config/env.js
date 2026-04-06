@@ -36,7 +36,11 @@ const env = {
 
   RATE_LIMIT_WINDOW_MS: toNumber(process.env.RATE_LIMIT_WINDOW_MS, 60_000),
   RATE_LIMIT_MAX: toNumber(process.env.RATE_LIMIT_MAX, 120),
-  ADMIN_RATE_LIMIT_MAX: toNumber(process.env.ADMIN_RATE_LIMIT_MAX, 10)
+  ADMIN_RATE_LIMIT_MAX: toNumber(process.env.ADMIN_RATE_LIMIT_MAX, 10),
+
+  UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
+  MAX_UPLOAD_MB: toNumber(process.env.MAX_UPLOAD_MB, 5),
+
 };
 
 export default env;

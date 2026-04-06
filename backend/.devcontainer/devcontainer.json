@@ -4,6 +4,17 @@
 	"name": "Node.js & TypeScript",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/typescript-node:4-24-trixie",
+  	"runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  	"forwardPorts": [5173, 8080, 3307],
+  	"customizations": {
+    	"vscode": {
+      		"extensions": [
+        		"ms-azuretools.vscode-docker",
+        		"dbaeumer.vscode-eslint",
+        		"esbenp.prettier-vscode"
+      		]
+    	}
+  	},		
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {}
 	}
