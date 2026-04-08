@@ -1,12 +1,62 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Aurora Frontend</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Version of Me</title>
+  <link rel="stylesheet" href="src/styles/styles.css">
 </head>
 <body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="src/pages/topics/self-management-skills/self-awareness.html">Self Awareness</a>
+    <a href="src/pages/topics/self-management-skills/self-management.html">Self Management</a>
+    <a href="src/pages/topics/self-management-skills/social-awareness.html">Social Awareness</a>
+    <a href="src/pages/topics/self-management-skills/relationship-management.html">Relationship Management</a>
+    <a href="src/pages/topics/self-management-skills/values-traits-strengths.html">Values, Traits & Strengths</a>
+    <a href="src/pages/topics/self-management-skills/leadership.html">Leadership</a>
+  </nav>
+
+  <section class="hero">
+    <h1>Best Version of Me</h1>
+    <a href="#topics">Explore Topics</a>
+  </section>
+
+  <section class="about" id="about">
+    <h2>About Us</h2>
+    <p>paragraph about online workshop</p>
+  </section>
+
+  <section class="topics" id="topics">
+    <h2>Explore Topics</h2>
+    <div class="cards">
+      <a href="src/pages/topics/self-management-skills/self-awareness.html" class="card">
+        <h3>Self Awareness</h3>
+        <p>Self awareness is understanding your thoughts, feelings, and behaviours</p>
+      </a>
+      <a href="src/pages/topics/self-management-skills/self-management.html" class="card">
+        <h3>Self Management</h3>
+        <p>Self management is about controlling emotions and staying on track with your goals</p>
+      </a>
+      <a href="src/pages/topics/self-management-skills/social-awareness.html" class="card">
+        <h3>Social Awareness</h3>
+        <p>Social awareness involves understanding others' feelings and perspectives</p>
+      </a>
+      <a href="src/pages/topics/self-management-skills/relationship-management.html" class="card">
+        <h3>Relationship Management</h3>
+        <p>Effective relationships are built on communication, empathy and trust</p>
+      </a>
+      <a href="src/pages/topics/self-management-skills/values-traits-strengths.html" class="card">
+        <h3>Values, Traits and Strengths</h3>
+        <p>brief explanation</p>
+      </a>
+      <a href="src/pages/topics/self-management-skills/leadership.html" class="card">
+        <h3>Leadership</h3>
+        <p>brief explanation</p>
+      </a>
+    </div>
+  </section>
+
+  <script src="src/js/script.js"></script>
 </body>
 </html>
