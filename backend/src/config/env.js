@@ -40,6 +40,7 @@ const env = {
 
   UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
   MAX_UPLOAD_MB: toNumber(process.env.MAX_UPLOAD_MB, 5),
+  MAX_VIDEO_UPLOAD_MB: toNumber(process.env.MAX_VIDEO_UPLOAD_MB, 50),
 
 };
 

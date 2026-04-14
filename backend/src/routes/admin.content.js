@@ -4,6 +4,7 @@ import { z } from "zod";
 import { query, execute } from "../db/index.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
+import { isMediaReference } from "../utils/media.js";
 
 const router = Router();
 
@@ -14,16 +15,27 @@ const themeSchema = z.object({
   published: z.boolean().default(false)
 });
 
-const moduleSchema = z.object({
+function mediaReferenceSchema(type) {
+  return z
+    .string()
+    .trim()
+    .max(500)
+    .refine((value) => isMediaReference(value, type), {
+      message:
+        type === "image"
+          ? "Must be an http(s) URL or a local /uploads/images/... path."
+          : "Must be an http(s) URL or a local /uploads/videos/... path."
+    });
+}
+
+export const moduleSchema = z.object({
   themeId: z.number().int().positive(),
   title: z.string().trim().min(1).max(255),
   summary: z.string().trim().max(5000).optional().default(""),
   body: z.string().trim().max(50000).optional().default(""),
-  imageUrl: z.string().trim().max(500).optional().default(""),
+  imageUrl: mediaReferenceSchema("image").optional().default(""),
   imageAltText: z.string().trim().max(255).optional().default(""),
-  // If stored locally like this: /uploads/images/example.png, annocate the current using videoUrl, and use the annocated videoUrl.
-  // videoUrl: z.string().trim().max(500).optional().default(""),
-  videoUrl: z.union([z.string().trim().url().max(500), z.literal("")]).optional().default(""),
+  videoUrl: mediaReferenceSchema("video").optional().default(""),
   challengeText: z.string().trim().max(5000).optional().default(""),
   sortOrder: z.number().int().min(0).default(0),
   published: z.boolean().default(false)

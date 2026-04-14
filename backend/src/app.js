@@ -4,11 +4,11 @@ import cors from "cors";
 import helmet from "helmet";
 import session from "express-session";
 import morgan from "morgan";
-import path from "path";
 
 import env from "./config/env.js";
 import logger from "./utils/logger.js";
 import { publicLimiter } from "./middleware/rateLimit.js";
+import { resolveUploadDir } from "./utils/media.js";
 
 import healthRoutes from "./routes/health.js";
 import publicContentRoutes from "./routes/public.content.js";
@@ -56,7 +56,7 @@ app.use(
 
 app.use(publicLimiter);
 
-app.use("/uploads", express.static(path.join(process.cwd(), env.UPLOAD_DIR)));
+app.use("/uploads", express.static(resolveUploadDir(env.UPLOAD_DIR)));
 
 app.use(healthRoutes);
 app.use("/api/content", publicContentRoutes);
@@ -73,6 +73,21 @@ app.use((req, res) => {
 });
 
 app.use((error, req, res, next) => {
+  if (error.name === "MulterError") {
+    return res.status(400).json({
+      message: error.message
+    });
+  }
+
+  if (
+    error.message === "Only JPG, PNG, and WEBP images are allowed." ||
+    error.message === "Only MP4, WEBM, MOV, and OGG videos are allowed."
+  ) {
+    return res.status(400).json({
+      message: error.message
+    });
+  }
+
   logger.error("Unhandled error", {
     message: error.message,
     stack: error.stack
