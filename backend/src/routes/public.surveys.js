@@ -29,8 +29,20 @@ function parseMaybeJson(value) {
   try {
     return JSON.parse(value);
   } catch {
-    return null;
+    return value;
   }
+}
+
+function hasMeaningfulAnswer(value) {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  if (typeof value === "string") {
+    return value.trim().length > 0;
+  }
+
+  return value !== null && value !== undefined;
 }
 
 async function findSurvey(surveyIdOrSlug) {
@@ -110,10 +122,22 @@ router.post(
       const questionMap = new Map(questions.map((q) => [q.id, q]));
       const answerMap = new Map(req.body.answers.map((a) => [a.questionId, a]));
 
+      if (answerMap.size !== req.body.answers.length) {
+        return res.status(400).json({
+          message: "Duplicate answers for the same question are not allowed"
+        });
+      }
+
       for (const q of questions) {
         if (q.isRequired && !answerMap.has(q.id)) {
           return res.status(400).json({
             message: `Missing required question: ${q.id}`
+          });
+        }
+
+        if (q.isRequired && !hasMeaningfulAnswer(answerMap.get(q.id)?.answer)) {
+          return res.status(400).json({
+            message: `Question ${q.id} requires a non-empty answer`
           });
         }
       }

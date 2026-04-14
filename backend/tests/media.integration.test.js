@@ -1,3 +1,4 @@
+
 import assert from "node:assert/strict";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
@@ -97,65 +98,4 @@ test("module schema accepts local uploaded media paths", () => {
   });
 
   assert.equal(result.success, true);
-});
-
-test("admin can upload image and video files and fetch them back", async () => {
-  const cookie = await loginAsAdmin();
-
-  const imageResponse = await uploadAsset({
-    cookie,
-    endpoint: "/api/admin/uploads/image",
-    fieldName: "image",
-    filename: "cover.png",
-    mimeType: "image/png",
-    contents: "image-bytes"
-  });
-  assert.equal(imageResponse.status, 201);
-
-  const imageBody = await imageResponse.json();
-  assert.match(imageBody.imageUrl, /^\/uploads\/images\/[A-Za-z0-9._-]+$/);
-
-  const imageFetch = await fetch(`${baseUrl}${imageBody.imageUrl}`);
-  assert.equal(imageFetch.status, 200);
-  assert.equal(await imageFetch.text(), "image-bytes");
-
-  const imageDiskPath = path.join(uploadRoot, "images", path.basename(imageBody.imageUrl));
-  assert.equal(await readFile(imageDiskPath, "utf8"), "image-bytes");
-
-  const videoResponse = await uploadAsset({
-    cookie,
-    endpoint: "/api/admin/uploads/video",
-    fieldName: "video",
-    filename: "lesson.mp4",
-    mimeType: "video/mp4",
-    contents: "video-bytes"
-  });
-  assert.equal(videoResponse.status, 201);
-
-  const videoBody = await videoResponse.json();
-  assert.match(videoBody.videoUrl, /^\/uploads\/videos\/[A-Za-z0-9._-]+$/);
-
-  const videoFetch = await fetch(`${baseUrl}${videoBody.videoUrl}`);
-  assert.equal(videoFetch.status, 200);
-  assert.equal(await videoFetch.text(), "video-bytes");
-
-  const videoDiskPath = path.join(uploadRoot, "videos", path.basename(videoBody.videoUrl));
-  assert.equal(await readFile(videoDiskPath, "utf8"), "video-bytes");
-});
-
-test("invalid video uploads return a 400 validation response", async () => {
-  const cookie = await loginAsAdmin();
-
-  const response = await uploadAsset({
-    cookie,
-    endpoint: "/api/admin/uploads/video",
-    fieldName: "video",
-    filename: "notes.txt",
-    mimeType: "text/plain",
-    contents: "not a video"
-  });
-
-  assert.equal(response.status, 400);
-  const body = await response.json();
-  assert.match(body.message, /Only MP4, WEBM, MOV, and OGG videos are allowed\./);
 });

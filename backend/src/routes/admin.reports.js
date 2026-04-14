@@ -106,7 +106,10 @@ router.get("/surveys/:surveyId/summary", async (req, res, next) => {
         questionKey: q.questionKey,
         prompt: q.prompt,
         questionType: q.questionType,
-        averageValue: avgRow?.averageValue ? Number(avgRow.averageValue) : null,
+        averageValue:
+          avgRow?.averageValue === null || avgRow?.averageValue === undefined
+            ? null
+            : Number(avgRow.averageValue),
         distribution: distribution.map((row) => ({
           value: row.answerJson ? parseMaybeJson(row.answerJson) : row.answerText,
           count: row.count
