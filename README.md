@@ -1,3 +1,16 @@
+Prerequisites:
+Node.js v20 or higher is required.
+Check your version with: node --version
+If you need to upgrade, use nvm: nvm install 22 && nvm use 22
+
+//
+
+Before running the backend for the first time, copy the example env file:
+cd backend
+cp .env.example .env
+
+//
+
 docker compose is inside docker, to run mysql, you need to start MySQL from the repo root. run: 
 //
 docker compose -f docker/docker-compose.yml up -d
@@ -38,6 +51,14 @@ Admin login:
 $body = '{"username":"admin","password":"change_me_now"}'
 Invoke-RestMethod -Method Post http://localhost:8080/api/admin/login -ContentType 'application/json' -Body $body -SessionVariable s
 Invoke-RestMethod http://localhost:8080/api/admin/me -WebSession $s
+
+//
+
+To run the frontend, go to the frontend folder:
+cd frontend
+npm install
+npm run dev
+The frontend will be available at http://localhost:5173
 
 //
 
