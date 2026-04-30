@@ -6,9 +6,8 @@ to shut it down, run:
 docker compose -f docker/docker-compose.yml down
 //
 To check the DB is up:
-Test-NetConnection -ComputerName 127.0.0.1 -Port 3307(IF RUNNING IN POWERSHELL)
-nc -zv 127.0.0.1 3307(IF RUNNING IN UBUNTU)
-if you see: TcpTestSucceeded : True(WINDOWS) or Connection to 127.0.0.1 3307 port [tcp/*] succeeded!(UBUNTU), then it means database is correctly started.
+Test-NetConnection -ComputerName 127.0.0.1 -Port 3307
+if you see: TcpTestSucceeded : True, then it means database is correctly started.
 //
 For migrations, run: 
 cd backend
