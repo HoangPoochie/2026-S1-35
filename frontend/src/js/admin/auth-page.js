@@ -7,7 +7,7 @@ const errorMessage = document.getElementById("error-message");
 async function checkExistingSession() {
   try {
     await getCurrentAdmin();
-    window.location.href = "/home.html";
+    window.location.href = "/src/pages/admin/dashboard.html";
   } catch {
     // stay on login page
   }
@@ -24,7 +24,7 @@ if (form) {
 
     try {
       await loginAdmin(username, password);
-        window.location.href = "/home.html";
+        window.location.href = "/src/pages/admin/dashboard.html";
     } catch (error) {
       errorMessage.textContent = error.message;
     }
