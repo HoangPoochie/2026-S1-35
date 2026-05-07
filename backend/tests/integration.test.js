@@ -30,6 +30,7 @@ process.env.DB_PASSWORD = rootDbPassword;
 process.env.ADMIN_USERNAME = "admin-test";
 process.env.ADMIN_PASSWORD = "admin-pass-test";
 process.env.SESSION_SECRET = "session-secret-test";
+process.env.SESSION_TIMEOUT_MS = "1000";
 process.env.UPLOAD_DIR = uploadRoot;
 process.env.MAX_UPLOAD_MB = "5";
 process.env.MAX_VIDEO_UPLOAD_MB = "20";
@@ -215,12 +216,27 @@ test("admin authentication login, me, and logout flow works", async () => {
   const meBody = await meResponse.json();
   assert.equal(meBody.admin.username, process.env.ADMIN_USERNAME);
   assert.equal(meBody.admin.loggedIn, true);
+  assert.match(meBody.admin.expiresAt, /^\d{4}-\d{2}-\d{2}T/);
 
   const logoutResponse = await adminJson("POST", "/api/admin/logout", cookie);
   assert.equal(logoutResponse.status, 200);
 
   const afterLogout = await adminJson("GET", "/api/admin/me", cookie);
   assert.equal(afterLogout.status, 401);
+});
+
+test("admin sessions expire after the configured timeout", async () => {
+  const cookie = await loginAsAdmin();
+
+  await new Promise((resolve) => {
+    setTimeout(resolve, 1100);
+  });
+
+  const response = await adminJson("GET", "/api/admin/me", cookie);
+  assert.equal(response.status, 401);
+
+  const body = await response.json();
+  assert.equal(body.code, "SESSION_EXPIRED");
 });
 
 test("admin content APIs manage themes and modules and public content exposes published items only", async () => {

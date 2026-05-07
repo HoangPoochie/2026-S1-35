@@ -1,10 +1,15 @@
-import { getCurrentAdmin } from "./auth.js";
+import {
+  getCurrentAdmin,
+  redirectToAdminLogin,
+  scheduleAdminSessionTimeout
+} from "./auth.js";
 
 async function protectPage() {
   try {
-    await getCurrentAdmin();
+    const data = await getCurrentAdmin();
+    scheduleAdminSessionTimeout(data.admin);
   } catch {
-    window.location.href = "/index.html";
+    redirectToAdminLogin();
   }
 }
 

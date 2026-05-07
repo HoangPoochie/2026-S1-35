@@ -31,6 +31,7 @@ const env = {
   SESSION_SECRET:
     process.env.SESSION_SECRET || "replace_with_a_long_random_secret",
   SESSION_NAME: process.env.SESSION_NAME || "bvom.sid",
+  SESSION_TIMEOUT_MS: toNumber(process.env.SESSION_TIMEOUT_MS, 30 * 60 * 1000),
   SESSION_COOKIE_SECURE: toBoolean(process.env.SESSION_COOKIE_SECURE, false),
   SESSION_COOKIE_SAMESITE: process.env.SESSION_COOKIE_SAMESITE || "lax",
 

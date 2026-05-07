@@ -49,7 +49,7 @@ app.use(
       httpOnly: true,
       secure: env.SESSION_COOKIE_SECURE,
       sameSite: env.SESSION_COOKIE_SAMESITE,
-      maxAge: 1000 * 60 * 60 * 8
+      maxAge: env.SESSION_TIMEOUT_MS
     }
   })
 );

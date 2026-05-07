@@ -1,12 +1,17 @@
 // auth-page.js
-import { loginAdmin, getCurrentAdmin } from "./auth.js";
+import {
+  getCurrentAdmin,
+  loginAdmin,
+  scheduleAdminSessionTimeout
+} from "./auth.js";
 
 const form = document.getElementById("login-form");
 const errorMessage = document.getElementById("error-message");
 
 async function checkExistingSession() {
   try {
-    await getCurrentAdmin();
+    const data = await getCurrentAdmin();
+    scheduleAdminSessionTimeout(data.admin);
     window.location.href = "/src/pages/admin/dashboard.html";
   } catch {
     // stay on login page
@@ -23,8 +28,9 @@ if (form) {
     errorMessage.textContent = "";
 
     try {
-      await loginAdmin(username, password);
-        window.location.href = "/src/pages/admin/dashboard.html";
+      const data = await loginAdmin(username, password);
+      scheduleAdminSessionTimeout(data.admin);
+      window.location.href = "/src/pages/admin/dashboard.html";
     } catch (error) {
       errorMessage.textContent = error.message;
     }

@@ -1,16 +1,22 @@
 // dashboard.js
-import { getCurrentAdmin, logoutAdmin } from "./auth.js";
+import {
+  getCurrentAdmin,
+  logoutAdmin,
+  redirectToAdminLogin,
+  scheduleAdminSessionTimeout
+} from "./auth.js";
 
 async function initDashboard() {
   try {
     const data = await getCurrentAdmin();
+    scheduleAdminSessionTimeout(data.admin);
 
     const adminName = document.getElementById("admin-name");
     if (adminName) {
       adminName.textContent = data.admin.username;
     }
   } catch {
-    window.location.href = "/src/pages/admin/login.html";
+    redirectToAdminLogin();
   }
 }
 
@@ -21,7 +27,7 @@ if (logoutButton) {
     try {
       await logoutAdmin();
     } finally {
-      window.location.href = "/src/pages/admin/login.html";
+      redirectToAdminLogin();
     }
   });
 }

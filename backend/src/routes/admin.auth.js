@@ -3,6 +3,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { timingSafeEqual } from "crypto";
 import env from "../config/env.js";
+import { getAdminSessionExpiry, requireAdmin } from "../middleware/auth.js";
 import { adminAuthLimiter } from "../middleware/rateLimit.js";
 import { validate } from "../middleware/validate.js";
 
@@ -34,10 +35,13 @@ router.post("/login", adminAuthLimiter, validate(loginSchema), (req, res) => {
     });
   }
 
+  const loggedInAt = new Date().toISOString();
+
   req.session.admin = {
     username: env.ADMIN_USERNAME,
     loggedIn: true,
-    loggedInAt: new Date().toISOString()
+    loggedInAt,
+    expiresAt: getAdminSessionExpiry(loggedInAt)
   };
 
   return res.json({
@@ -52,11 +56,7 @@ router.post("/logout", (req, res) => {
   });
 });
 
-router.get("/me", (req, res) => {
-  if (!req.session?.admin?.loggedIn) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
+router.get("/me", requireAdmin, (req, res) => {
   res.json({
     admin: req.session.admin
   });
