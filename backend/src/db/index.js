@@ -11,7 +11,8 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   namedPlaceholders: true,
-  multipleStatements: true
+  multipleStatements: true,
+  timezone: 'Z'
 });
 
 export async function query(sql, params = {}) {

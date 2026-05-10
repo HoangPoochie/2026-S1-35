@@ -17,6 +17,7 @@ import adminAuthRoutes from "./routes/admin.auth.js";
 import adminContentRoutes from "./routes/admin.content.js";
 import adminReportRoutes from "./routes/admin.reports.js";
 import adminUploadRoutes from "./routes/admin.uploads.js";
+import activityRoutes from "./routes/admin.activity.js";
 
 const app = express();
 
@@ -65,6 +66,7 @@ app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin", adminContentRoutes);
 app.use("/api/admin/reports", adminReportRoutes);
 app.use("/api/admin", adminUploadRoutes);
+app.use("/api/activity", activityRoutes);
 
 app.use((req, res) => {
   res.status(404).json({
