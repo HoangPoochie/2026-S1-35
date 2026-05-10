@@ -1,10 +1,134 @@
 // dashboard.js
-import {
-  getCurrentAdmin,
-  logoutAdmin,
-  redirectToAdminLogin,
-  scheduleAdminSessionTimeout
-} from "./auth.js";
+import { getCurrentAdmin, logoutAdmin } from "./auth.js";
+import { apiFetch } from "../api/client.js";
+import { endpoints } from "../api/endpoints.js";
+
+async function loadRecentActivities() {
+  try {
+    const data = await apiFetch(endpoints.adminRecentActivities + "?limit=50");
+    renderActivitiesTable(data.activities);
+  } catch (error) {
+    console.error("Failed to load activities:", error);
+    const tbody = document.getElementById("activities-body");
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="5">Failed to load activities</td></tr>';
+    }
+  }
+}
+
+async function loadViewsPerPage() {
+  try {
+    const data = await apiFetch(endpoints.adminViewsPerPage);
+    const tbody = document.getElementById("views-per-page-body");
+    if (!tbody) return;
+
+    if (!data.report || data.report.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4">No data available</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = data.report
+      .map(
+        (row) => `
+      <tr>
+        <td>${row.pageTitle || "-"}</td>
+        <td>${row.pagePath}</td>
+        <td>${row.totalViews}</td>
+        <td>${row.uniqueUsers}</td>
+      </tr>
+    `
+      )
+      .join("");
+  } catch (error) {
+    console.error("Failed to load views per page:", error);
+    const tbody = document.getElementById("views-per-page-body");
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="4">Failed to load data</td></tr>';
+    }
+  }
+}
+
+async function loadViewsPerDay() {
+  try {
+    const data = await apiFetch(endpoints.adminViewsPerDay + "?days=7");
+    renderViewsTable(data.report);
+    updateSummary(data.summary);
+  } catch (error) {
+    console.error("Failed to load views report:", error);
+    const tbody = document.getElementById("views-body");
+    if (tbody) {
+      tbody.innerHTML = '<tr><td colspan="3">Failed to load data</td></tr>';
+    }
+  }
+}
+
+function renderActivitiesTable(activities) {
+  const tbody = document.getElementById("activities-body");
+  if (!tbody) return;
+
+  if (!activities || activities.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No activities yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = activities
+    .map((activity) => {
+      const time = new Date(activity.timestamp).toLocaleString();
+      const type = activity.activityType === "page_view" ? "Page View" : "Survey";
+      const details =
+        activity.activityType === "page_view"
+          ? activity.pageTitle || activity.pagePath
+          : activity.surveyName;
+
+      return `
+      <tr>
+        <td>${time}</td>
+        <td>${type}</td>
+        <td>${activity.submissionCode || "-"}</td>
+        <td>${activity.cohortCode || "-"}</td>
+        <td>${details}</td>
+      </tr>
+    `;
+    })
+    .join("");
+}
+
+function renderViewsTable(report) {
+  const tbody = document.getElementById("views-body");
+  if (!tbody) return;
+
+  if (!report || report.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="3">No data available</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = report
+    .map(
+      (day) => `
+    <tr>
+      <td>${day.date}</td>
+      <td>${day.totalViews}</td>
+      <td>${day.uniqueUsers}</td>
+    </tr>
+  `
+    )
+    .join("");
+}
+
+function updateSummary(summary) {
+  if (!summary) return;
+
+  const totalViews = document.getElementById("total-views");
+  const avgViews = document.getElementById("avg-views");
+
+  if (totalViews) {
+    totalViews.textContent = summary.totalViews || 0;
+  }
+
+  if (avgViews) {
+    avgViews.textContent = Math.round(summary.averageViewsPerDay || 0);
+  }
+}
 
 async function initDashboard() {
   try {
@@ -15,6 +139,10 @@ async function initDashboard() {
     if (adminName) {
       adminName.textContent = data.admin.username;
     }
+
+    await Promise.all([loadRecentActivities(), loadViewsPerDay(), loadViewsPerPage()]);
+
+    setInterval(loadRecentActivities, 30000);
   } catch {
     redirectToAdminLogin();
   }
