@@ -4,6 +4,10 @@
 // This file contains all the text content for the BVM web app.
 // To update content, edit the text in this file only.
 // Do not edit index.html or module.html unless changing layout.
+//
+//NOTE: index.html currently has its own inline copy of BVM_DATA
+//for the dashboard SPA. This file is loaded by module.html (legacy).
+//If both are kept, they need to stay in sync.
 // ============================================================
 
 const BVM_DATA = {
