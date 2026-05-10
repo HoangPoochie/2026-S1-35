@@ -78,6 +78,7 @@ body {
 }
 
 .card {
+  position: relative;
   background-color: white;
   border-radius: 8px;
   padding: 32 px 24 px;
@@ -89,6 +90,28 @@ body {
 .card:hover {
   background-color: navy;
   color: white;
+}
+
+.card--visited,
+.card--complete {
+  border: 2px solid navy;
+}
+
+.card--complete {
+  background-color: #f1f7f1;
+}
+
+.progress-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  margin-top: 12px;
+  border-radius: 999px;
+  background: navy;
+  color: white;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .card h3 {
@@ -121,6 +144,52 @@ body {
   color: black;
 }
 
+.local-progress {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  max-width: 1000px;
+  margin: 28px auto;
+  padding: 18px 24px;
+  border: 1px solid #d8dce8;
+  border-radius: 8px;
+  background: #f7f9fc;
+  color: #111827;
+}
+
+.local-progress__summary,
+.local-progress__actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.local-progress__label {
+  color: navy;
+  font-weight: 700;
+}
+
+.local-progress__button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid navy;
+  border-radius: 6px;
+  background: navy;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+}
+
+.local-progress__button--secondary {
+  background: white;
+  color: navy;
+}
+
+.local-progress__button:hover {
+  filter: brightness(0.95);
+}
+
 .back-link {
   display: block;
   text-align: center;
@@ -131,4 +200,15 @@ body {
 
 .back-link:hover {
   text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .local-progress {
+    flex-direction: column;
+    margin: 20px 16px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
 }
