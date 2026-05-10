@@ -12,7 +12,7 @@ async function checkExistingSession() {
   try {
     const data = await getCurrentAdmin();
     scheduleAdminSessionTimeout(data.admin);
-    window.location.href = "/src/pages/admin/dashboard.html";
+    window.location.href = "/src/admin/dashboard.html";
   } catch {
     // stay on login page
   }
@@ -30,7 +30,7 @@ if (form) {
     try {
       const data = await loginAdmin(username, password);
       scheduleAdminSessionTimeout(data.admin);
-      window.location.href = "/src/pages/admin/dashboard.html";
+      window.location.href = "/src/admin/dashboard.html";
     } catch (error) {
       errorMessage.textContent = error.message;
     }
