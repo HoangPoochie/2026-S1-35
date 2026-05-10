@@ -92,6 +92,16 @@
     .module-card:nth-child(3){animation-delay:0.30s;} .module-card:nth-child(4){animation-delay:0.36s;}
     .module-card:nth-child(5){animation-delay:0.42s;} .module-card:nth-child(6){animation-delay:0.48s;}
 
+    .journal-card-dl { background:var(--white); border:1.5px solid var(--teal-light); border-radius:var(--radius); padding:32px 36px; display:flex; align-items:center; justify-content:space-between; gap:32px; margin-top:48px; animation:fadeUp 0.5s 0.5s ease both; }
+    .journal-card-dl-left { display:flex; align-items:center; gap:20px; flex:1; }
+    .journal-card-dl-icon { width:52px; height:52px; background:var(--teal-light); border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.4rem; }
+    .journal-card-dl-eyebrow { font-size:0.7rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-muted); font-weight:500; margin-bottom:4px; }
+    .journal-card-dl-title { font-family:'Playfair Display',serif; font-size:1.15rem; color:var(--teal-deep); margin-bottom:4px; }
+    .journal-card-dl-desc { font-size:0.82rem; color:var(--text-body); font-weight:300; line-height:1.5; }
+    .journal-dl-btn { display:inline-flex; align-items:center; gap:8px; background:var(--teal-deep); color:var(--white); border:none; border-radius:50px; padding:13px 24px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; text-decoration:none; transition:var(--transition); white-space:nowrap; flex-shrink:0; }
+    .journal-dl-btn:hover { opacity:0.88; transform:translateY(-2px); }
+    @media(max-width:640px) { .journal-card-dl{flex-direction:column;align-items:flex-start;padding:24px 20px;gap:20px;} }
+
     .db-footer { background:var(--white); border-top:1.5px solid var(--teal-light); padding:24px 48px; display:flex; align-items:center; justify-content:space-between; }
     .footer-brand { font-family:'Playfair Display',serif; font-style:italic; font-size:0.95rem; color:var(--teal-deep); }
     .footer-org { font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; }
@@ -329,6 +339,21 @@
         <p class="module-desc">The ability to guide, inspire, and support others in a positive way.</p>
         <div class="module-footer"><span class="module-tag">Leadership</span><span class="module-arrow">→</span></div>
       </button>
+    </div>
+
+    <div class="journal-card-dl">
+      <div class="journal-card-dl-left">
+        <div class="journal-card-dl-icon">📓</div>
+        <div>
+          <div class="journal-card-dl-eyebrow">Companion Resource</div>
+          <div class="journal-card-dl-title">BVM Journal</div>
+          <p class="journal-card-dl-desc">Your personal journal for activities and reflections throughout the program. Download and print before you begin.</p>
+        </div>
+      </div>
+      <a href="journal.pdf" download="BVM Journal" class="journal-dl-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v8M3 6l4 4 4-4M1 11h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Download Journal
+      </a>
     </div>
   </main>
 
