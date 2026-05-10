@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 docker compose is inside docker, to run mysql, you need to start MySQL from the repo root. run: 
 //
 docker compose -f docker/docker-compose.yml up -d
@@ -131,4 +132,3 @@ curl -b cookies.txt \
 for more info about backend, please check the readme inside the backend folder.
 
 for backend, scripts avaliable are inside package.json
-
