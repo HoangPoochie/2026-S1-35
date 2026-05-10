@@ -3,7 +3,7 @@ import { apiFetch } from "../api/client.js";
 import { endpoints } from "../api/endpoints.js";
 
 let sessionTimeoutTimer = null;
-const ADMIN_LOGIN_PATH = "/src/pages/admin/login.html";
+const ADMIN_LOGIN_PATH = "/src/admin/login.html";
 
 export async function loginAdmin(username, password) {
   return apiFetch(endpoints.adminLogin, {

@@ -6,7 +6,7 @@ import {
   setPublicPageCompleted
 } from "../utils/storage.js";
 
-const TOPIC_PATH_PREFIX = "/src/pages/topics/";
+const TOPIC_PATH_PREFIX = "/src/topics/";
 
 function normalizePath(value, base = window.location.href) {
   return new URL(value, base).pathname;

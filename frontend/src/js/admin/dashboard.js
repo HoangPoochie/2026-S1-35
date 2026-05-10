@@ -1,5 +1,5 @@
 // dashboard.js
-import { getCurrentAdmin, logoutAdmin } from "./auth.js";
+import { getCurrentAdmin, logoutAdmin, scheduleAdminSessionTimeout, redirectToAdminLogin } from "./auth.js";
 import { apiFetch } from "../api/client.js";
 import { endpoints } from "../api/endpoints.js";
 
