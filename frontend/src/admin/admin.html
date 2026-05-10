@@ -4,24 +4,184 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login</title>
-  <link rel="stylesheet" href="/src/styles/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal-deep:#1B4F6B; --teal-mid:#2A6E8F; --teal-light:#D6E9F0;
+      --slate:#7A9BAD; --slate-pale:#EBF3F7; --white:#FFFFFF; --offwhite:#F7FBFD;
+      --text-dark:#122433; --text-body:#3A5A6E; --text-muted:#7A9BAD;
+      --accent:#1B4F6B; --accent-light:#D6E9F0; --radius:18px;
+      --transition:0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--offwhite);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header — matches dashboard */
+    .db-header {
+      background: var(--white);
+      border-bottom: 1.5px solid var(--teal-light);
+      padding: 0 48px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 20px rgba(27,79,107,0.07);
+    }
+    .header-brand { display: flex; align-items: center; gap: 14px; }
+    .dots { display: flex; gap: 8px; align-items: center; }
+    .dots span { width: 10px; height: 10px; border-radius: 50%; background: var(--teal-deep); display: inline-block; }
+    .dots.sm span { width: 7px; height: 7px; }
+    .logo-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.25rem; color: var(--teal-deep); line-height: 1.1; }
+    .logo-text span { font-style: normal; font-weight: 700; display: block; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--slate); }
+    .header-label { font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; font-weight: 500; }
+
+    /* Login layout */
+    .login-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+    }
+    .login-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 1.5px solid var(--teal-light);
+      box-shadow: 0 4px 32px rgba(27,79,107,0.09);
+      padding: 48px 44px;
+      width: 100%;
+      max-width: 400px;
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+    .login-eyebrow {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+    .login-title {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 1.8rem;
+      color: var(--teal-deep);
+      margin-bottom: 32px;
+      line-height: 1.15;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-body);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--teal-light);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      background: var(--offwhite);
+      outline: none;
+      transition: var(--transition);
+    }
+    .form-group input:focus {
+      border-color: var(--teal-mid);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(42,110,143,0.1);
+    }
+    .form-group input::placeholder { color: var(--text-muted); }
+
+    .login-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 13px;
+      background: var(--accent);
+      color: var(--white);
+      border: none;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .login-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .login-btn:active { transform: translateY(0); }
+
+    #error-message {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: #C62828;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .back-link:hover { color: var(--teal-deep); }
+
+    @media (max-width: 480px) {
+      .db-header { padding: 0 20px; }
+      .login-card { padding: 36px 28px; }
+    }
+  </style>
 </head>
 <body>
-  <nav class="navbar">
-    <a href="/index.html">Home</a>
-  </nav>
-  <main>
-    <section>
-      <h1>Admin Login</h1>
+
+  <header class="db-header">
+    <div class="header-brand">
+      <div class="dots sm"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="logo-text"><span>Global Community Sports</span>Best Version of Me</div>
+    </div>
+    <div class="header-label">Admin</div>
+  </header>
+
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-eyebrow">Admin Portal</div>
+      <div class="login-title">Sign in</div>
 
       <form id="login-form">
-        <input id="username" name="username" type="text" placeholder="Admin username" required>
-        <input id="password" name="password" type="password" placeholder="Admin password" autocomplete="current-password" required>
-        <button type="submit">Login</button>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" placeholder="Admin username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" placeholder="Admin password" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="login-btn">Sign in</button>
         <p id="error-message"></p>
       </form>
-    </section>
-  </main>
+
+      <a href="../../index.html" class="back-link">← Back to program</a>
+    </div>
+  </div>
 
   <script type="module" src="/src/js/admin/auth-page.js"></script>
 </body>
