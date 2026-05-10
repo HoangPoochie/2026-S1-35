@@ -1,0 +1,21 @@
+App Structure
+A two-view architecture:
+1. Home Dashboard — the landing page. Shows the Introduction module 
+prominently at the top, then the 6 modules as cards below, 
+accessible in any order. Each card shows the module name, a
+short description, and a visual icon consistent with the BVM branding.
+
+2. Module View — when a module is selected, it opens in a clean 
+full-screen reader. Content is broken into "screens" (not slides — 
+more on this below), navigated with next/back arrows or a progress bar. 
+Students on their own devices land on the same module but can tap ahead or 
+revisit freely.
+
+Design Language (from the slides)
+
+Deep teal (#1a5276 range) as the primary colour
+Slate blue-grey as the secondary/accent panel colour
+Italic serif font for headings (e.g. Playfair Display or similar from Google Fonts)
+Clean sans-serif for body text
+Dot motifs as decorative elements
+White backgrounds with generous whitespace
