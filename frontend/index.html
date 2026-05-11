@@ -69,6 +69,9 @@
     .intro-card-desc { font-size:0.85rem; color:rgba(255,255,255,0.68); font-weight:300; line-height:1.6; max-width:500px; }
     .intro-card-right { display:flex; align-items:center; gap:20px; flex-shrink:0; }
     .start-btn { background:var(--white); color:var(--teal-deep); border:none; border-radius:50px; padding:13px 28px; font-family:'DM Sans',sans-serif; font-size:0.85rem; font-weight:500; cursor:pointer; display:flex; align-items:center; gap:8px; transition:var(--transition); white-space:nowrap; pointer-events:none; }
+    .intro-card .module-status { background:rgba(255,255,255,0.18); color:var(--white); }
+    .intro-card.is-started .module-status { background:rgba(255,255,255,0.28); color:var(--white); }
+    .intro-card.is-complete .module-status { background:var(--white); color:var(--teal-deep); }
 
     .modules-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
     .module-card { background:var(--white); border-radius:var(--radius); padding:32px 28px; cursor:pointer; border:1.5px solid transparent; transition:var(--transition); position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(27,79,107,0.06); text-align:left; width:100%; font-family:'DM Sans',sans-serif; animation:fadeUp 0.5s ease both; }
@@ -82,6 +85,12 @@
     .module-footer { display:flex; align-items:center; justify-content:space-between; margin-top:20px; padding-top:16px; border-top:1px solid var(--slate-pale); }
     .module-tag { font-size:0.68rem; color:var(--text-muted); letter-spacing:0.08em; text-transform:uppercase; }
     .module-arrow { opacity:0.5; transition:var(--transition); font-size:1.1rem; color:var(--card-accent,var(--teal-mid)); }
+    .module-card.is-started,
+    .module-card.is-complete { border-color:var(--card-accent,var(--teal-mid)); }
+    .module-card.is-complete { background:linear-gradient(180deg,var(--white),var(--slate-pale)); }
+    .module-status { display:inline-flex; align-items:center; border-radius:50px; padding:4px 10px; background:var(--slate-pale); color:var(--text-muted); font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; font-weight:500; }
+    .module-card.is-started .module-status { background:var(--card-accent,var(--teal-mid)); color:var(--white); }
+    .module-card.is-complete .module-status { background:#2A7F62; color:var(--white); }
     .card-1{--card-accent:#1B4F6B;} .card-1 .module-icon{background:#D6E9F0;}
     .card-2{--card-accent:#2A7F62;} .card-2 .module-icon{background:#D6EDE5;}
     .card-3{--card-accent:#5B6BAD;} .card-3 .module-icon{background:#DDE1F4;}
@@ -102,9 +111,22 @@
     .journal-dl-btn:hover { opacity:0.88; transform:translateY(-2px); }
     @media(max-width:640px) { .journal-card-dl{flex-direction:column;align-items:flex-start;padding:24px 20px;gap:20px;} }
 
+    .local-progress { background:var(--white); border:1.5px solid var(--teal-light); border-radius:var(--radius); padding:24px 28px; margin:0 0 40px; display:flex; align-items:center; justify-content:space-between; gap:24px; box-shadow:0 2px 12px rgba(27,79,107,0.06); animation:fadeUp 0.5s 0.12s ease both; }
+    .local-progress-title { font-family:'Playfair Display',serif; font-style:italic; color:var(--teal-deep); font-size:1.2rem; margin-bottom:6px; }
+    .local-progress-copy { color:var(--text-body); font-size:0.84rem; line-height:1.55; font-weight:300; }
+    .local-progress-stats { display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:flex-end; }
+    .local-progress-pill { border-radius:50px; background:var(--slate-pale); color:var(--teal-deep); padding:8px 14px; font-size:0.76rem; font-weight:500; white-space:nowrap; }
+    .local-progress-reset { border:1.5px solid var(--teal-light); background:var(--white); color:var(--text-body); border-radius:50px; padding:8px 14px; font-family:'DM Sans',sans-serif; font-size:0.76rem; cursor:pointer; transition:var(--transition); }
+    .local-progress-reset:hover { border-color:var(--teal-deep); color:var(--teal-deep); }
+
     .db-footer { background:var(--white); border-top:1.5px solid var(--teal-light); padding:24px 48px; display:flex; align-items:center; justify-content:space-between; }
     .footer-brand { font-family:'Playfair Display',serif; font-style:italic; font-size:0.95rem; color:var(--teal-deep); }
     .footer-org { font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; }
+
+    @media(max-width:760px) {
+      .local-progress { flex-direction:column; align-items:flex-start; }
+      .local-progress-stats { justify-content:flex-start; }
+    }
 
     /* ── MODULE VIEW ── */
     .mod-header { background:var(--white); border-bottom:1.5px solid var(--teal-light); padding:0 40px; height:64px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:200; box-shadow:0 2px 16px rgba(27,79,107,0.07); }
@@ -292,7 +314,7 @@
 
   <main class="db-main">
     <div class="section-header"><h2>Start here</h2><div class="line"></div></div>
-    <button class="intro-card" onclick="openModule('introduction')">
+    <button class="intro-card" data-module-id="introduction" onclick="openModule('introduction')">
       <div class="intro-card-left">
         <div class="intro-card-eyebrow">Introduction · Recommended first</div>
         <div class="intro-card-title">Welcome to Best Version of Me</div>
@@ -304,39 +326,51 @@
       </div>
     </button>
 
+    <section class="local-progress" aria-live="polite">
+      <div>
+        <div class="local-progress-title">Your progress on this browser</div>
+        <p class="local-progress-copy">Saved only on this device with browser local storage. Nothing personal is sent to the backend.</p>
+      </div>
+      <div class="local-progress-stats">
+        <span class="local-progress-pill" id="progress-started">0 started</span>
+        <span class="local-progress-pill" id="progress-completed">0 complete</span>
+        <button class="local-progress-reset" type="button" onclick="resetPublicProgress()">Reset progress</button>
+      </div>
+    </section>
+
     <div class="section-header" id="modules-section"><h2>Six Skills</h2><div class="line"></div></div>
     <div class="modules-grid">
-      <button class="module-card card-1" onclick="openModule('self-awareness')">
+      <button class="module-card card-1" data-module-id="self-awareness" onclick="openModule('self-awareness')">
         <div class="module-icon">🤍</div><div class="module-num">Skill 01</div>
         <div class="module-title">Self-Awareness</div>
         <p class="module-desc">Understanding your own emotions, thoughts, and behaviours, and how they affect yourself and others.</p>
         <div class="module-footer"><span class="module-tag">Self-awareness</span><span class="module-arrow">→</span></div>
       </button>
-      <button class="module-card card-2" onclick="openModule('self-management')">
+      <button class="module-card card-2" data-module-id="self-management" onclick="openModule('self-management')">
         <div class="module-icon">🌿</div><div class="module-num">Skill 02</div>
         <div class="module-title">Self Management</div>
         <p class="module-desc">Controlling your emotions, behaviours, and actions to stay focused on your goals.</p>
         <div class="module-footer"><span class="module-tag">Self-management</span><span class="module-arrow">→</span></div>
       </button>
-      <button class="module-card card-3" onclick="openModule('social-awareness')">
+      <button class="module-card card-3" data-module-id="social-awareness" onclick="openModule('social-awareness')">
         <div class="module-icon">💭</div><div class="module-num">Skill 03</div>
         <div class="module-title">Social Awareness</div>
         <p class="module-desc">Understanding how other people feel and what's happening in the world around you.</p>
         <div class="module-footer"><span class="module-tag">social-awareness</span><span class="module-arrow">→</span></div>
       </button>
-      <button class="module-card card-4" onclick="openModule('relationship-management')">
+      <button class="module-card card-4" data-module-id="relationship-management" onclick="openModule('relationship-management')">
         <div class="module-icon">🔄</div><div class="module-num">Skill 04</div>
         <div class="module-title">Relationship Management</div>
         <p class="module-desc">Effective relationships are built on communication, empathy, and trust.</p>
         <div class="module-footer"><span class="module-tag">Relationship-management</span><span class="module-arrow">→</span></div>
       </button>
-      <button class="module-card card-5" onclick="openModule('values')">
+      <button class="module-card card-5" data-module-id="values" onclick="openModule('values')">
         <div class="module-icon">🧘</div><div class="module-num">Skill 05</div>
         <div class="module-title">Values, Character Traits, & Strengths</div>
         <p class="module-desc">Values = what matters most to you. Character Traits = who you are. Strengths = what you're good at</p>
         <div class="module-footer"><span class="module-tag">Values-Character-Traits-Strengths</span><span class="module-arrow">→</span></div>
       </button>
-      <button class="module-card card-6" onclick="openModule('leadership')">
+      <button class="module-card card-6" data-module-id="leadership" onclick="openModule('leadership')">
         <div class="module-icon">🔍</div><div class="module-num">Skill 06</div>
         <div class="module-title">Leadership</div>
         <p class="module-desc">The ability to guide, inspire, and support others in a positive way.</p>
@@ -895,12 +929,146 @@ const BVM_DATA = {
 // ══════════════════════════════════════════════════════
 let currentModule = null;
 let currentScreen = 0;
+const PUBLIC_PROGRESS_KEY = 'bvm.publicProgress.v1';
+
+function createEmptyPublicProgress() {
+  return { version: 1, modules: {} };
+}
+
+function getPublicProgressStorage() {
+  try {
+    const storage = window.localStorage;
+    const testKey = '__bvm_public_progress_test__';
+    storage.setItem(testKey, '1');
+    storage.removeItem(testKey);
+    return storage;
+  } catch {
+    return null;
+  }
+}
+
+function readPublicProgress() {
+  const storage = getPublicProgressStorage();
+  if (!storage) return createEmptyPublicProgress();
+
+  try {
+    const parsed = JSON.parse(storage.getItem(PUBLIC_PROGRESS_KEY));
+    if (!parsed || typeof parsed !== 'object' || !parsed.modules) {
+      return createEmptyPublicProgress();
+    }
+    return parsed;
+  } catch {
+    return createEmptyPublicProgress();
+  }
+}
+
+function writePublicProgress(progress) {
+  const storage = getPublicProgressStorage();
+  if (!storage) return;
+  storage.setItem(PUBLIC_PROGRESS_KEY, JSON.stringify(progress));
+}
+
+function clearPublicProgress() {
+  const storage = getPublicProgressStorage();
+  if (!storage) return;
+  storage.removeItem(PUBLIC_PROGRESS_KEY);
+}
+
+function getModuleById(id) {
+  return id === 'introduction'
+    ? BVM_DATA.introduction
+    : BVM_DATA.modules.find(m => m.id === id);
+}
+
+function getPublicModuleIds() {
+  return ['introduction', ...BVM_DATA.modules.map(m => m.id)];
+}
+
+function clampScreenIndex(moduleData, screenIndex) {
+  const screenCount = moduleData?.screens?.length || 1;
+  const parsed = Number.parseInt(screenIndex, 10);
+  const safeIndex = Number.isFinite(parsed) ? parsed : 0;
+  return Math.max(0, Math.min(screenCount - 1, safeIndex));
+}
+
+function savePublicModuleProgress(moduleId, screenIndex, updates = {}) {
+  const progress = readPublicProgress();
+  const existing = progress.modules[moduleId] || {};
+  const now = new Date().toISOString();
+
+  progress.modules[moduleId] = {
+    ...existing,
+    ...updates,
+    visitedAt: existing.visitedAt || now,
+    lastVisitedAt: now,
+    lastScreen: clampScreenIndex(getModuleById(moduleId), screenIndex)
+  };
+
+  writePublicProgress(progress);
+  return progress.modules[moduleId];
+}
+
+function completePublicModule(moduleId) {
+  return savePublicModuleProgress(moduleId, currentScreen, {
+    completedAt: new Date().toISOString()
+  });
+}
+
+function getModuleStatusText(moduleId, entry) {
+  const moduleData = getModuleById(moduleId);
+  const screenCount = moduleData?.screens?.length || 1;
+
+  if (!entry) return 'Not started';
+  if (entry.completedAt) return 'Done';
+
+  const screenNumber = clampScreenIndex(moduleData, entry.lastScreen) + 1;
+  return `Started ${screenNumber}/${screenCount}`;
+}
+
+function renderPublicProgressOverview() {
+  const progress = readPublicProgress();
+  const moduleIds = getPublicModuleIds();
+  const startedCount = moduleIds.filter(id => progress.modules[id]).length;
+  const completedCount = moduleIds.filter(id => progress.modules[id]?.completedAt).length;
+
+  const startedEl = document.getElementById('progress-started');
+  const completedEl = document.getElementById('progress-completed');
+  if (startedEl) startedEl.textContent = `${startedCount} started`;
+  if (completedEl) completedEl.textContent = `${completedCount} complete`;
+
+  document.querySelectorAll('[data-module-id]').forEach(card => {
+    const moduleId = card.dataset.moduleId;
+    const entry = progress.modules[moduleId];
+    const statusText = getModuleStatusText(moduleId, entry);
+    const target = card.querySelector('.module-footer') || card.querySelector('.intro-card-right') || card;
+    let status = card.querySelector('.module-status');
+
+    card.classList.toggle('is-started', Boolean(entry && !entry.completedAt));
+    card.classList.toggle('is-complete', Boolean(entry?.completedAt));
+
+    if (!status) {
+      status = document.createElement('span');
+      status.className = 'module-status';
+      target.insertBefore(status, target.lastElementChild || null);
+    }
+
+    status.textContent = statusText;
+  });
+}
+
+function resetPublicProgress() {
+  clearPublicProgress();
+  renderPublicProgressOverview();
+}
 
 function openModule(id) {
   currentModule = id === 'introduction'
     ? BVM_DATA.introduction
     : BVM_DATA.modules.find(m => m.id === id);
-  currentScreen = 0;
+  trackPageView(`/module/${id}`, currentModule.title);
+  const savedProgress = readPublicProgress().modules[id];
+  currentScreen = clampScreenIndex(currentModule, savedProgress?.lastScreen || 0);
+  savePublicModuleProgress(id, currentScreen);
   document.documentElement.style.setProperty('--accent', currentModule.color);
   document.documentElement.style.setProperty('--accent-light', currentModule.colorLight);
   document.getElementById('view-dashboard').style.display = 'none';
@@ -914,6 +1082,7 @@ function closeModule() {
   document.getElementById('view-dashboard').style.display = 'block';
   document.documentElement.style.setProperty('--accent','#1B4F6B');
   document.documentElement.style.setProperty('--accent-light','#D6E9F0');
+  renderPublicProgressOverview();
   window.scrollTo(0,0);
 }
 
@@ -922,6 +1091,7 @@ function renderScreen() {
   const total = screens.length;
   const s = screens[currentScreen];
   const isLast = currentScreen === total - 1;
+  savePublicModuleProgress(currentModule.id, currentScreen);
 
   document.getElementById('mod-nav-title').textContent = currentModule.title;
   document.getElementById('mod-nav-sub').textContent = currentModule.subtitle;
@@ -1210,6 +1380,28 @@ function goTo(i) {
   renderScreen();
   window.scrollTo({top:0,behavior:'smooth'});
 }
+
+async function trackPageView(pagePath, pageTitle) {
+  try {
+    await fetch("http://localhost:8080/api/activity/page-view", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({
+        pagePath,
+        pageTitle,
+        referrer: document.referrer || null
+      })
+    });
+  } catch (error) {
+    console.warn("Page view tracking failed:", error);
+  }
+}
+
+trackPageView("/", "Home");
+renderPublicProgressOverview();
 </script>
 </body>
 </html>
