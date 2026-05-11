@@ -25,6 +25,129 @@
 
     <hr>
 
+    <h2>Content Management</h2>
+    <p class="admin-help">Create and update public workshop themes and modules. Published items appear in the public content API.</p>
+    <p id="content-message" class="admin-message" role="status"></p>
+
+    <div class="content-admin-grid">
+      <form id="theme-form" class="admin-form">
+        <h3>Theme</h3>
+        <input type="hidden" id="theme-id">
+        <label>
+          Title
+          <input id="theme-title" type="text" required>
+        </label>
+        <label>
+          Description
+          <textarea id="theme-description" rows="3"></textarea>
+        </label>
+        <label>
+          Sort order
+          <input id="theme-sort-order" type="number" min="0" value="0">
+        </label>
+        <label class="checkbox-label">
+          <input id="theme-published" type="checkbox">
+          Published
+        </label>
+        <div class="form-actions">
+          <button type="submit">Save Theme</button>
+          <button type="button" id="theme-reset">New Theme</button>
+        </div>
+      </form>
+
+      <form id="module-form" class="admin-form">
+        <h3>Module</h3>
+        <input type="hidden" id="module-id">
+        <label>
+          Theme
+          <select id="module-theme-id" required></select>
+        </label>
+        <label>
+          Title
+          <input id="module-title" type="text" required>
+        </label>
+        <label>
+          Summary
+          <textarea id="module-summary" rows="2"></textarea>
+        </label>
+        <label>
+          Body
+          <textarea id="module-body" rows="5"></textarea>
+        </label>
+        <label>
+          Image URL
+          <input id="module-image-url" type="url" placeholder="https://... or /uploads/images/...">
+        </label>
+        <label>
+          Image alt text
+          <input id="module-image-alt-text" type="text">
+        </label>
+        <label>
+          Upload image
+          <input id="module-image-file" type="file" accept="image/jpeg,image/png,image/webp">
+        </label>
+        <button type="button" id="upload-image-button">Upload Image</button>
+        <label>
+          Video URL
+          <input id="module-video-url" type="url" placeholder="https://... or /uploads/videos/...">
+        </label>
+        <label>
+          Upload video
+          <input id="module-video-file" type="file" accept="video/mp4,video/webm,video/quicktime,video/ogg">
+        </label>
+        <button type="button" id="upload-video-button">Upload Video</button>
+        <label>
+          Challenge text
+          <textarea id="module-challenge-text" rows="3"></textarea>
+        </label>
+        <label>
+          Sort order
+          <input id="module-sort-order" type="number" min="0" value="0">
+        </label>
+        <label class="checkbox-label">
+          <input id="module-published" type="checkbox">
+          Published
+        </label>
+        <div class="form-actions">
+          <button type="submit">Save Module</button>
+          <button type="button" id="module-reset">New Module</button>
+        </div>
+      </form>
+    </div>
+
+    <h3>Existing Themes</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Published</th>
+          <th>Sort</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="themes-body">
+        <tr><td colspan="4">Loading...</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Existing Modules</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Theme</th>
+          <th>Published</th>
+          <th>Sort</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="modules-body">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
+
+    <hr>
+
     <h2>Views Per Page</h2>
     <table>
       <thead>
@@ -76,5 +199,6 @@
   </div>
 
   <script type="module" src="/src/js/admin/dashboard.js"></script>
+  <script type="module" src="/src/js/admin/content.js"></script>
 </body>
 </html>

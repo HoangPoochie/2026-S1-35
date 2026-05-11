@@ -24,6 +24,17 @@ export function requireAdmin(req, res, next) {
   const admin = req.session?.admin;
 
   if (!admin?.loggedIn) {
+    const hadSessionCookie = req.headers.cookie
+      ?.split(";")
+      .some((cookie) => cookie.trim().startsWith(`${env.SESSION_NAME}=`));
+
+    if (hadSessionCookie) {
+      return res.status(401).json({
+        code: "SESSION_EXPIRED",
+        message: "Session expired. Please log in again."
+      });
+    }
+
     return res.status(401).json({
       message: "Unauthorized"
     });

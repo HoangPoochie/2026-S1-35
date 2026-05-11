@@ -1337,6 +1337,7 @@ function buildScreen(s) {
 // COMPLETE SCREEN
 // ══════════════════════════════════════════════════════
 function showComplete() {
+  completePublicModule(currentModule.id);
   const allIds = ['introduction', ...BVM_DATA.modules.map(m=>m.id)];
   const idx = allIds.indexOf(currentModule.id);
   const nextId = allIds[idx+1] || null;

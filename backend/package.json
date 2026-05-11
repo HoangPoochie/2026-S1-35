@@ -4,7 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "nodemon --legacy-watch --watch src --ext js,json --ignore uploads --ignore node_modules src/server.js",
+    "dev:native": "nodemon --watch src --ext js,json --ignore uploads --ignore node_modules src/server.js",
+    "dev:poll": "nodemon --legacy-watch --watch src --ext js,json --ignore uploads --ignore node_modules src/server.js",
     "start": "node src/server.js",
     "format": "prettier -w .",
     "test": "node tests/integration.test.js",
