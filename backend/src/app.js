@@ -50,7 +50,7 @@ app.use(
       httpOnly: true,
       secure: env.SESSION_COOKIE_SECURE,
       sameSite: env.SESSION_COOKIE_SAMESITE,
-      maxAge: env.SESSION_TIMEOUT_MS
+      maxAge: env.SESSION_TIMEOUT_MS * 2
     }
   })
 );
