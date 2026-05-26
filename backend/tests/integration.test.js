@@ -258,6 +258,7 @@ test("admin content APIs manage themes and modules and public content exposes pu
     published: false
   });
   assert.equal(createDraftTheme.status, 201);
+  const draftTheme = await createDraftTheme.json();
 
   const uploadImageResponse = await uploadAsset({
     cookie,
@@ -295,6 +296,46 @@ test("admin content APIs manage themes and modules and public content exposes pu
   });
   assert.equal(createModule.status, 201);
   const module = await createModule.json();
+  assert.deepEqual(
+    module.mediaItems.map((item) => ({
+      mediaType: item.mediaType,
+      url: item.url,
+      altText: item.altText,
+      sortOrder: item.sortOrder
+    })),
+    [
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        altText: "Illustration",
+        sortOrder: 0
+      },
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        altText: "",
+        sortOrder: 1
+      }
+    ]
+  );
+
+  const uploadsList = await adminJson("GET", "/api/admin/uploads", cookie);
+  assert.equal(uploadsList.status, 200);
+  const uploadsListBody = await uploadsList.json();
+  const listedImage = uploadsListBody.images.find(
+    (item) => item.url === uploadedImage.imageUrl
+  );
+  const listedVideo = uploadsListBody.videos.find(
+    (item) => item.url === uploadedVideo.videoUrl
+  );
+  assert.ok(listedImage, "expected uploaded image to appear in media library");
+  assert.ok(listedVideo, "expected uploaded video to appear in media library");
+  assert.deepEqual(listedImage.referencedBy, [
+    { id: module.id, title: "Know Yourself" }
+  ]);
+  assert.deepEqual(listedVideo.referencedBy, [
+    { id: module.id, title: "Know Yourself" }
+  ]);
 
   const createDraftModule = await adminJson("POST", "/api/admin/modules", cookie, {
     themeId: theme.id,
@@ -329,7 +370,27 @@ test("admin content APIs manage themes and modules and public content exposes pu
     videoUrl: uploadedVideo.videoUrl,
     challengeText: "Updated reflection",
     sortOrder: 1,
-    published: true
+    published: true,
+    mediaItems: [
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        altText: "Lesson video",
+        sortOrder: 0
+      },
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        altText: "Updated illustration",
+        sortOrder: 1
+      },
+      {
+        mediaType: "image",
+        url: "https://example.com/extra.png",
+        altText: "External image",
+        sortOrder: 2
+      }
+    ]
   });
   assert.equal(updateModule.status, 200);
 

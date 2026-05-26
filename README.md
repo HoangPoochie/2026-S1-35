@@ -57,6 +57,7 @@ cd docker && docker compose exec backend npm test
 ```bash
 # Bash
 curl http://localhost:8080/health
+```
 
 # PowerShell
 Invoke-RestMethod http://localhost:8080/health

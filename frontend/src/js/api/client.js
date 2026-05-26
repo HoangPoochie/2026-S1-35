@@ -1,11 +1,16 @@
 export async function apiFetch(url, options = {}) {
+  const isFormData = options.body instanceof FormData;
+  const headers = isFormData
+    ? { ...(options.headers || {}) }
+    : {
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+
   const response = await fetch(url, {
     ...options,
     credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {})
-    }
+    headers
   });
 
   let data = null;

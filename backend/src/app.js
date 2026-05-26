@@ -11,8 +11,8 @@ import { publicLimiter } from "./middleware/rateLimit.js";
 import { resolveUploadDir } from "./utils/media.js";
 
 import healthRoutes from "./routes/health.js";
-//import publicContentRoutes from "./routes/public.content.js";
-//import publicSurveyRoutes from "./routes/public.surveys.js";
+import publicContentRoutes from "./routes/public.content.js";
+import publicSurveyRoutes from "./routes/public.surveys.js";
 import adminAuthRoutes from "./routes/admin.auth.js";
 import adminContentRoutes from "./routes/admin.content.js";
 import adminReportRoutes from "./routes/admin.reports.js";
@@ -60,8 +60,8 @@ app.use(publicLimiter);
 app.use("/uploads", express.static(resolveUploadDir(env.UPLOAD_DIR)));
 
 app.use(healthRoutes);
-//app.use("/api/content", publicContentRoutes);
-//app.use("/api/surveys", publicSurveyRoutes);
+app.use("/api/content", publicContentRoutes);
+app.use("/api/surveys", publicSurveyRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/admin", adminContentRoutes);
 app.use("/api/admin/reports", adminReportRoutes);
