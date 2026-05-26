@@ -296,6 +296,28 @@ test("admin content APIs manage themes and modules and public content exposes pu
   });
   assert.equal(createModule.status, 201);
   const module = await createModule.json();
+  assert.deepEqual(
+    module.mediaItems.map((item) => ({
+      mediaType: item.mediaType,
+      url: item.url,
+      altText: item.altText,
+      sortOrder: item.sortOrder
+    })),
+    [
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        altText: "Illustration",
+        sortOrder: 0
+      },
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        altText: "",
+        sortOrder: 1
+      }
+    ]
+  );
 
   const uploadsList = await adminJson("GET", "/api/admin/uploads", cookie);
   assert.equal(uploadsList.status, 200);
@@ -348,7 +370,27 @@ test("admin content APIs manage themes and modules and public content exposes pu
     videoUrl: uploadedVideo.videoUrl,
     challengeText: "Updated reflection",
     sortOrder: 1,
-    published: true
+    published: true,
+    mediaItems: [
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        altText: "Lesson video",
+        sortOrder: 0
+      },
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        altText: "Updated illustration",
+        sortOrder: 1
+      },
+      {
+        mediaType: "image",
+        url: "https://example.com/extra.png",
+        altText: "External image",
+        sortOrder: 2
+      }
+    ]
   });
   assert.equal(updateModule.status, 200);
 
@@ -375,12 +417,37 @@ test("admin content APIs manage themes and modules and public content exposes pu
   assert.equal(publicModulesBody[0].title, "Know Yourself Better");
   assert.equal(publicModulesBody[0].imageUrl, uploadedImage.imageUrl);
   assert.equal(publicModulesBody[0].videoUrl, uploadedVideo.videoUrl);
+  assert.deepEqual(
+    publicModulesBody[0].mediaItems.map((item) => ({
+      mediaType: item.mediaType,
+      url: item.url,
+      sortOrder: item.sortOrder
+    })),
+    [
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        sortOrder: 0
+      },
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        sortOrder: 1
+      },
+      {
+        mediaType: "image",
+        url: "https://example.com/extra.png",
+        sortOrder: 2
+      }
+    ]
+  );
 
   const publicModule = await fetch(`${baseUrl}/api/content/modules/${module.id}`);
   assert.equal(publicModule.status, 200);
   const publicModuleBody = await publicModule.json();
   assert.equal(publicModuleBody.body, "Updated module body");
   assert.equal(publicModuleBody.challengeText, "Updated reflection");
+  assert.equal(publicModuleBody.mediaItems.length, 3);
 
   const hiddenModule = await fetch(
     `${baseUrl}/api/content/modules/${draftModule.id}`
@@ -397,7 +464,27 @@ test("admin content APIs manage themes and modules and public content exposes pu
     videoUrl: uploadedVideo.videoUrl,
     challengeText: "Updated reflection",
     sortOrder: 1,
-    published: false
+    published: false,
+    mediaItems: [
+      {
+        mediaType: "video",
+        url: uploadedVideo.videoUrl,
+        altText: "Lesson video",
+        sortOrder: 0
+      },
+      {
+        mediaType: "image",
+        url: uploadedImage.imageUrl,
+        altText: "Updated illustration",
+        sortOrder: 1
+      },
+      {
+        mediaType: "image",
+        url: "https://example.com/extra.png",
+        altText: "External image",
+        sortOrder: 2
+      }
+    ]
   });
   assert.equal(unpublishModule.status, 200);
 
@@ -409,6 +496,32 @@ test("admin content APIs manage themes and modules and public content exposes pu
   const adminModulesAfterUnpublishBody = await adminModulesAfterUnpublish.json();
   assert.equal(
     adminModulesAfterUnpublishBody.find((item) => item.id === module.id).published,
+    false
+  );
+
+  const deleteUploadedImage = await adminJson(
+    "DELETE",
+    `/api/admin/uploads/image/${uploadedImage.filename}`,
+    cookie
+  );
+  assert.equal(deleteUploadedImage.status, 200);
+
+  const adminModulesAfterUploadDelete = await adminJson("GET", "/api/admin/modules", cookie);
+  assert.equal(adminModulesAfterUploadDelete.status, 200);
+  const adminModulesAfterUploadDeleteBody = await adminModulesAfterUploadDelete.json();
+  const moduleAfterUploadDelete = adminModulesAfterUploadDeleteBody.find(
+    (item) => item.id === module.id
+  );
+  assert.equal(
+    moduleAfterUploadDelete.mediaItems.some((item) => item.url === uploadedImage.imageUrl),
+    false
+  );
+
+  const uploadsAfterDelete = await adminJson("GET", "/api/admin/uploads", cookie);
+  assert.equal(uploadsAfterDelete.status, 200);
+  const uploadsAfterDeleteBody = await uploadsAfterDelete.json();
+  assert.equal(
+    uploadsAfterDeleteBody.images.some((item) => item.url === uploadedImage.imageUrl),
     false
   );
 

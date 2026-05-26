@@ -164,6 +164,22 @@ hr {
   color: var(--text-dark);
 }
 
+.media-fieldset {
+  border: 1.5px solid var(--teal-light);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 4px 0;
+  padding: 14px;
+}
+
+.media-fieldset legend {
+  color: var(--teal-deep);
+  font-weight: 700;
+  padding: 0 6px;
+}
+
 .admin-form input,
 .admin-form select,
 .admin-form textarea {
@@ -225,6 +241,12 @@ table {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 8px rgba(27, 79, 107, 0.06);
+}
+
+.media-items-table {
+  font-size: 0.8rem;
+  box-shadow: none;
+  margin-top: 4px;
 }
 
 thead th {

@@ -984,8 +984,26 @@ function buildCmsScreens(theme, module) {
   const screens = [];
   const summary = plainText(module.summary) || plainText(theme.description);
   const body = plainText(module.body);
-  const imageUrl = resolveMediaUrl(module.imageUrl);
-  const videoUrl = resolveMediaUrl(module.videoUrl);
+  const mediaItems = Array.isArray(module.mediaItems) && module.mediaItems.length > 0
+    ? module.mediaItems
+    : [
+        module.imageUrl
+          ? {
+              mediaType:'image',
+              url:module.imageUrl,
+              altText:module.imageAltText || module.title,
+              sortOrder:0
+            }
+          : null,
+        module.videoUrl
+          ? {
+              mediaType:'video',
+              url:module.videoUrl,
+              altText:'',
+              sortOrder:1
+            }
+          : null
+      ].filter(Boolean);
   const challengeText = plainText(module.challengeText);
 
   screens.push({
@@ -994,29 +1012,38 @@ function buildCmsScreens(theme, module) {
     body:escapeHtml(summary || body || 'Open this module to work through the published workshop material.')
   });
 
-  if (imageUrl) {
-    screens.push({
-      type:'image',
-      heading:escapeHtml(module.title),
-      imageUrl:escapeHtml(imageUrl),
-      imageAltText:escapeHtml(module.imageAltText || module.title)
+  mediaItems
+    .slice()
+    .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+    .forEach((item) => {
+      const mediaUrl = resolveMediaUrl(item.url);
+      if (!mediaUrl) return;
+
+      if (item.mediaType === 'image') {
+        screens.push({
+          type:'image',
+          heading:escapeHtml(module.title),
+          imageUrl:escapeHtml(mediaUrl),
+          imageAltText:escapeHtml(item.altText || module.title)
+        });
+        return;
+      }
+
+      if (item.mediaType === 'video') {
+        screens.push({
+          type:'video',
+          heading:'Watch',
+          url:escapeHtml(mediaUrl),
+          videoTitle:escapeHtml(item.altText || module.title),
+          videoSub:'Open the media for this module'
+        });
+      }
     });
-  }
 
   if (body && body !== summary) {
     screens.push({
       type:'learning',
       body:escapeHtml(body)
-    });
-  }
-
-  if (videoUrl) {
-    screens.push({
-      type:'video',
-      heading:'Watch',
-      url:escapeHtml(videoUrl),
-      videoTitle:escapeHtml(module.title),
-      videoSub:'Open the media for this module'
     });
   }
 

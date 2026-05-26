@@ -94,7 +94,21 @@ test("module schema accepts local uploaded media paths", () => {
     videoUrl: "/uploads/videos/example.mp4",
     challengeText: "Reflection prompt",
     sortOrder: 0,
-    published: false
+    published: false,
+    mediaItems: [
+      {
+        mediaType: "image",
+        url: "/uploads/images/example.png",
+        altText: "An example image",
+        sortOrder: 0
+      },
+      {
+        mediaType: "video",
+        url: "/uploads/videos/example.mp4",
+        altText: "An example video",
+        sortOrder: 1
+      }
+    ]
   });
 
   assert.equal(result.success, true);

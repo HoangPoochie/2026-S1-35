@@ -4,6 +4,7 @@ import { endpoints } from "../api/endpoints.js";
 let themes = [];
 let modules = [];
 let uploads = { images: [], videos: [] };
+let moduleMediaItems = [];
 
 const contentMessage = document.getElementById("content-message");
 const themeForm = document.getElementById("theme-form");
@@ -64,6 +65,137 @@ function formatBytes(bytes) {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function normalizeMediaItems(items = []) {
+  return items
+    .filter((item) => item?.url)
+    .map((item, index) => ({
+      mediaType: item.mediaType === "video" ? "video" : "image",
+      url: String(item.url || "").trim(),
+      altText: String(item.altText || "").trim(),
+      sortOrder: Number.isInteger(Number(item.sortOrder))
+        ? Number(item.sortOrder)
+        : index
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((item, index) => ({ ...item, sortOrder: index }));
+}
+
+function legacyMediaItemsFromModule(module) {
+  const items = [];
+
+  if (module.imageUrl) {
+    items.push({
+      mediaType: "image",
+      url: module.imageUrl,
+      altText: module.imageAltText || "",
+      sortOrder: 0
+    });
+  }
+
+  if (module.videoUrl) {
+    items.push({
+      mediaType: "video",
+      url: module.videoUrl,
+      altText: "",
+      sortOrder: items.length
+    });
+  }
+
+  return items;
+}
+
+function resetMediaDraft() {
+  setValue("module-media-type", "image");
+  setValue("module-media-url", "");
+  setValue("module-media-alt-text", "");
+  setValue("module-media-sort-order", String(moduleMediaItems.length));
+}
+
+function setMediaDraft({ mediaType = "image", url = "", altText = "", sortOrder } = {}) {
+  setValue("module-media-type", mediaType);
+  setValue("module-media-url", url);
+  setValue("module-media-alt-text", altText);
+  setValue(
+    "module-media-sort-order",
+    String(Number.isInteger(Number(sortOrder)) ? Number(sortOrder) : moduleMediaItems.length)
+  );
+}
+
+function renderModuleMediaItems() {
+  const tbody = document.getElementById("module-media-body");
+  if (!tbody) return;
+
+  moduleMediaItems = normalizeMediaItems(moduleMediaItems);
+
+  if (moduleMediaItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No media items added</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = moduleMediaItems
+    .map(
+      (item, index) => `
+        <tr>
+          <td>${index}</td>
+          <td>${item.mediaType === "image" ? "Image" : "Video"}</td>
+          <td><code>${escapeHtml(item.url)}</code></td>
+          <td>${escapeHtml(item.altText || "-")}</td>
+          <td>
+            <button type="button" data-move-media="${index}" data-move-media-dir="-1">Up</button>
+            <button type="button" data-move-media="${index}" data-move-media-dir="1">Down</button>
+            <button type="button" data-edit-media="${index}">Edit</button>
+            <button type="button" data-remove-media="${index}">Remove</button>
+          </td>
+        </tr>
+      `
+    )
+    .join("");
+}
+
+function addMediaItemFromDraft() {
+  const mediaType = getValue("module-media-type") === "video" ? "video" : "image";
+  const url = getValue("module-media-url");
+  const altText = getValue("module-media-alt-text");
+  const sortOrder = getNumberValue("module-media-sort-order");
+
+  if (!url) {
+    setMessage("Add a media URL or upload path first.", true);
+    return;
+  }
+
+  moduleMediaItems.push({ mediaType, url, altText, sortOrder });
+  moduleMediaItems = normalizeMediaItems(moduleMediaItems);
+  renderModuleMediaItems();
+  resetMediaDraft();
+  setMessage("Media item added. Save the module to keep the media list.");
+}
+
+function removeMediaItem(index) {
+  moduleMediaItems.splice(index, 1);
+  moduleMediaItems = normalizeMediaItems(moduleMediaItems);
+  renderModuleMediaItems();
+  resetMediaDraft();
+  setMessage("Media item removed. Save the module to keep this change.");
+}
+
+function editMediaItem(index) {
+  const item = moduleMediaItems[index];
+  if (!item) return;
+  setMediaDraft({ ...item, sortOrder: index });
+}
+
+function moveMediaItem(index, direction) {
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= moduleMediaItems.length) return;
+
+  const [item] = moduleMediaItems.splice(index, 1);
+  moduleMediaItems.splice(nextIndex, 0, item);
+  moduleMediaItems = normalizeMediaItems(moduleMediaItems);
+  renderModuleMediaItems();
+  resetMediaDraft();
+  setMessage("Media order changed. Save the module to keep this order.");
+}
+
 function themePayload() {
   return {
     title: getValue("theme-title"),
@@ -74,17 +206,22 @@ function themePayload() {
 }
 
 function modulePayload() {
+  const mediaItems = normalizeMediaItems(moduleMediaItems);
+  const firstImage = mediaItems.find((item) => item.mediaType === "image");
+  const firstVideo = mediaItems.find((item) => item.mediaType === "video");
+
   return {
     themeId: Number(getValue("module-theme-id")),
     title: getValue("module-title"),
     summary: getValue("module-summary"),
     body: getValue("module-body"),
-    imageUrl: getValue("module-image-url"),
-    imageAltText: getValue("module-image-alt-text"),
-    videoUrl: getValue("module-video-url"),
+    imageUrl: firstImage?.url || "",
+    imageAltText: firstImage?.altText || "",
+    videoUrl: firstVideo?.url || "",
     challengeText: getValue("module-challenge-text"),
     sortOrder: getNumberValue("module-sort-order"),
-    published: getChecked("module-published")
+    published: getChecked("module-published"),
+    mediaItems
   };
 }
 
@@ -101,12 +238,12 @@ function resetModuleForm() {
   setValue("module-title", "");
   setValue("module-summary", "");
   setValue("module-body", "");
-  setValue("module-image-url", "");
-  setValue("module-image-alt-text", "");
-  setValue("module-video-url", "");
   setValue("module-challenge-text", "");
   setValue("module-sort-order", "0");
   setChecked("module-published", false);
+  moduleMediaItems = [];
+  renderModuleMediaItems();
+  resetMediaDraft();
 }
 
 function renderThemeOptions() {
@@ -200,7 +337,10 @@ function renderUploads() {
           <td><code>${escapeHtml(item.url)}</code></td>
           <td>${formatBytes(item.size)}</td>
           <td>${references}</td>
-          <td><button type="button" data-use-upload="${escapeHtml(item.url)}" data-use-upload-type="${useTarget}">Use</button></td>
+          <td>
+            <button type="button" data-use-upload="${escapeHtml(item.url)}" data-use-upload-type="${useTarget}">Use</button>
+            <button type="button" data-delete-upload="${escapeHtml(item.filename)}" data-delete-upload-type="${useTarget}" data-delete-upload-url="${escapeHtml(item.url)}">Delete</button>
+          </td>
         </tr>
       `;
     })
@@ -246,12 +386,14 @@ function editModule(id) {
   setValue("module-title", module.title);
   setValue("module-summary", module.summary);
   setValue("module-body", module.body);
-  setValue("module-image-url", module.imageUrl);
-  setValue("module-image-alt-text", module.imageAltText);
-  setValue("module-video-url", module.videoUrl);
   setValue("module-challenge-text", module.challengeText);
   setValue("module-sort-order", module.sortOrder);
   setChecked("module-published", isPublished(module.published));
+  moduleMediaItems = normalizeMediaItems(
+    module.mediaItems?.length ? module.mediaItems : legacyMediaItemsFromModule(module)
+  );
+  renderModuleMediaItems();
+  resetMediaDraft();
 }
 
 async function deleteTheme(id) {
@@ -302,7 +444,29 @@ async function deleteModule(id) {
   }
 }
 
-async function uploadMedia({ inputId, endpoint, fieldName, responseKey, targetInputId }) {
+async function deleteUpload({ type, filename, url }) {
+  const label = type === "image" ? "image" : "video";
+  const confirmed = window.confirm(
+    `Delete this ${label} upload? Any module media entries using it will also be removed.`
+  );
+  if (!confirmed) return;
+
+  try {
+    await apiFetch(`${endpoints.adminUploads}/${type}/${encodeURIComponent(filename)}`, {
+      method: "DELETE"
+    });
+
+    moduleMediaItems = moduleMediaItems.filter((item) => item.url !== url);
+    renderModuleMediaItems();
+    resetMediaDraft();
+    setMessage(`${label[0].toUpperCase()}${label.slice(1)} upload deleted.`);
+    await loadContent();
+  } catch (error) {
+    setMessage(error.message, true);
+  }
+}
+
+async function uploadMedia({ inputId, endpoint, fieldName, responseKey, mediaType }) {
   const input = document.getElementById(inputId);
   const file = input?.files?.[0];
 
@@ -320,9 +484,16 @@ async function uploadMedia({ inputId, endpoint, fieldName, responseKey, targetIn
       body: formData
     });
 
-    setValue(targetInputId, result[responseKey]);
+    moduleMediaItems.push({
+      mediaType,
+      url: result[responseKey],
+      altText: "",
+      sortOrder: moduleMediaItems.length
+    });
+    renderModuleMediaItems();
+    resetMediaDraft();
     clearFileInput(inputId);
-    setMessage("Upload complete. Save the module to keep this media.");
+    setMessage("Upload added to this module. Save the module to keep this media.");
     await loadContent();
   } catch (error) {
     setMessage(error.message, true);
@@ -380,7 +551,7 @@ document.getElementById("upload-image-button")?.addEventListener("click", () => 
     endpoint: endpoints.adminUploadImage,
     fieldName: "image",
     responseKey: "imageUrl",
-    targetInputId: "module-image-url"
+    mediaType: "image"
   });
 });
 
@@ -389,20 +560,13 @@ document.getElementById("clear-image-file-button")?.addEventListener("click", ()
   setMessage("Selected image cleared.");
 });
 
-document.getElementById("clear-image-path-button")?.addEventListener("click", () => {
-  setValue("module-image-url", "");
-  setValue("module-image-alt-text", "");
-  clearFileInput("module-image-file");
-  setMessage("Image path cleared. Save the module to remove it from this module.");
-});
-
 document.getElementById("upload-video-button")?.addEventListener("click", () => {
   uploadMedia({
     inputId: "module-video-file",
     endpoint: endpoints.adminUploadVideo,
     fieldName: "video",
     responseKey: "videoUrl",
-    targetInputId: "module-video-url"
+    mediaType: "video"
   });
 });
 
@@ -411,10 +575,10 @@ document.getElementById("clear-video-file-button")?.addEventListener("click", ()
   setMessage("Selected video cleared.");
 });
 
-document.getElementById("clear-video-path-button")?.addEventListener("click", () => {
-  setValue("module-video-url", "");
-  clearFileInput("module-video-file");
-  setMessage("Video path cleared. Save the module to remove it from this module.");
+document.getElementById("add-media-item-button")?.addEventListener("click", addMediaItemFromDraft);
+document.getElementById("reset-media-item-button")?.addEventListener("click", () => {
+  resetMediaDraft();
+  setMessage("Media draft cleared.");
 });
 
 document.addEventListener("click", (event) => {
@@ -423,12 +587,43 @@ document.addEventListener("click", (event) => {
   const deleteThemeButton = event.target.closest("[data-delete-theme]");
   const deleteModuleButton = event.target.closest("[data-delete-module]");
   const useUploadButton = event.target.closest("[data-use-upload]");
+  const deleteUploadButton = event.target.closest("[data-delete-upload]");
+  const removeMediaButton = event.target.closest("[data-remove-media]");
+  const editMediaButton = event.target.closest("[data-edit-media]");
+  const moveMediaButton = event.target.closest("[data-move-media]");
+
+  if (moveMediaButton) {
+    moveMediaItem(
+      Number(moveMediaButton.dataset.moveMedia),
+      Number(moveMediaButton.dataset.moveMediaDir)
+    );
+    return;
+  }
+
+  if (editMediaButton) {
+    editMediaItem(Number(editMediaButton.dataset.editMedia));
+    return;
+  }
+
+  if (removeMediaButton) {
+    removeMediaItem(Number(removeMediaButton.dataset.removeMedia));
+    return;
+  }
+
+  if (deleteUploadButton) {
+    deleteUpload({
+      type: deleteUploadButton.dataset.deleteUploadType,
+      filename: deleteUploadButton.dataset.deleteUpload,
+      url: deleteUploadButton.dataset.deleteUploadUrl
+    });
+    return;
+  }
 
   if (useUploadButton) {
     const type = useUploadButton.dataset.useUploadType;
     const url = useUploadButton.dataset.useUpload;
-    setValue(type === "image" ? "module-image-url" : "module-video-url", url);
-    setMessage(`${type === "image" ? "Image" : "Video"} path selected. Save the module to keep it.`);
+    setMediaDraft({ mediaType: type, url });
+    setMessage(`${type === "image" ? "Image" : "Video"} path selected. Add it to the module media list, then save.`);
     return;
   }
 
@@ -452,4 +647,6 @@ document.addEventListener("click", (event) => {
   }
 });
 
+renderModuleMediaItems();
+resetMediaDraft();
 loadContent();
