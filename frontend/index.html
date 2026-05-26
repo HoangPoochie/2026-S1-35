@@ -74,6 +74,12 @@
     .intro-card.is-complete .module-status { background:var(--white); color:var(--teal-deep); }
 
     .modules-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
+    .modules-cms { display:flex; flex-direction:column; gap:36px; }
+    .theme-group { display:flex; flex-direction:column; gap:18px; }
+    .theme-group-header { display:flex; flex-direction:column; gap:6px; }
+    .theme-group-title { font-family:'Playfair Display',serif; font-style:italic; font-size:1.35rem; color:var(--teal-deep); }
+    .theme-group-desc { color:var(--text-body); font-size:0.86rem; line-height:1.55; font-weight:300; max-width:720px; }
+    .theme-group-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; }
     .module-card { background:var(--white); border-radius:var(--radius); padding:32px 28px; cursor:pointer; border:1.5px solid transparent; transition:var(--transition); position:relative; overflow:hidden; box-shadow:0 2px 12px rgba(27,79,107,0.06); text-align:left; width:100%; font-family:'DM Sans',sans-serif; animation:fadeUp 0.5s ease both; }
     .module-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background:var(--card-accent,var(--teal-mid)); border-radius:var(--radius) var(--radius) 0 0; }
     .module-card:hover { border-color:var(--card-accent,var(--teal-mid)); transform:translateY(-4px); box-shadow:0 12px 32px rgba(27,79,107,0.13); }
@@ -191,6 +197,10 @@
     .bullet-dot { width:8px; height:8px; border-radius:50%; background:var(--accent); flex-shrink:0; margin-top:7px; opacity:0.6; }
     .bullet-text { font-size:0.95rem; color:var(--text-body); line-height:1.6; font-weight:300; }
 
+    .screen-image-card { background:var(--white); border:1.5px solid var(--teal-light); border-radius:var(--radius); overflow:hidden; box-shadow:0 2px 16px rgba(27,79,107,0.07); }
+    .screen-image-card img { display:block; width:auto; max-width:100%; height:auto; max-height:460px; object-fit:contain; margin:0 auto; background:var(--slate-pale); }
+    .screen-image-caption { padding:16px 20px; color:var(--text-body); font-size:0.86rem; line-height:1.5; }
+
     /* Callout */
     .callout-card { background:var(--white); border-left:4px solid var(--accent); border-radius:0 var(--radius) var(--radius) 0; padding:28px 32px; box-shadow:0 2px 16px rgba(27,79,107,0.07); }
 
@@ -270,8 +280,8 @@
 
     @keyframes fadeUp { from{opacity:0;transform:translateY(24px);} to{opacity:1;transform:translateY(0);} }
 
-    @media(max-width:900px) { .modules-grid{grid-template-columns:repeat(2,1fr);} .hero-inner{grid-template-columns:1fr;} .hero-stats{flex-direction:row;min-width:unset;padding:20px 24px;} }
-    @media(max-width:640px) { .db-header,.db-footer{padding:0 20px;} .hero{padding:48px 20px;} .db-main{padding:40px 20px 60px;} .db-footer{padding:20px;flex-direction:column;gap:8px;text-align:center;} .modules-grid{grid-template-columns:1fr;} .intro-card{flex-direction:column;padding:28px 24px;} .intro-card-right{width:100%;justify-content:space-between;} .mod-header{padding:0 16px;} .mod-content-wrap{padding:32px 16px 24px;} .mod-bottom-nav{padding:16px 20px;} .activity-card{padding:24px 20px;} .skills-grid{grid-template-columns:1fr 1fr;} .mod-nav-sub{display:none;} .asmr-grid{grid-template-columns:1fr;} }
+    @media(max-width:900px) { .modules-grid,.theme-group-grid{grid-template-columns:repeat(2,1fr);} .hero-inner{grid-template-columns:1fr;} .hero-stats{flex-direction:row;min-width:unset;padding:20px 24px;} }
+    @media(max-width:640px) { .db-header,.db-footer{padding:0 20px;} .hero{padding:48px 20px;} .db-main{padding:40px 20px 60px;} .db-footer{padding:20px;flex-direction:column;gap:8px;text-align:center;} .modules-grid,.theme-group-grid{grid-template-columns:1fr;} .intro-card{flex-direction:column;padding:28px 24px;} .intro-card-right{width:100%;justify-content:space-between;} .mod-header{padding:0 16px;} .mod-content-wrap{padding:32px 16px 24px;} .mod-bottom-nav{padding:16px 20px;} .activity-card{padding:24px 20px;} .skills-grid{grid-template-columns:1fr 1fr;} .mod-nav-sub{display:none;} .asmr-grid{grid-template-columns:1fr;} }
     @media(max-width:480px) { .skills-grid{grid-template-columns:1fr;} }
   </style>
 </head>
@@ -930,6 +940,230 @@ const BVM_DATA = {
 let currentModule = null;
 let currentScreen = 0;
 const PUBLIC_PROGRESS_KEY = 'bvm.publicProgress.v1';
+const API_BASE = window.BVM_API_BASE_URL || 'http://localhost:8080';
+const CMS_CARD_COLORS = [
+  { color:'#1B4F6B', colorLight:'#D6E9F0' },
+  { color:'#2A7F62', colorLight:'#D6EDE5' },
+  { color:'#5B6BAD', colorLight:'#DDE1F4' },
+  { color:'#8B5A9E', colorLight:'#EDDDFA' },
+  { color:'#3A8FA3', colorLight:'#D6EFF5' },
+  { color:'#9E6B3A', colorLight:'#F5E8D6' }
+];
+let publicContent = BVM_DATA;
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function plainText(value) {
+  return String(value ?? '').trim();
+}
+
+function resolveMediaUrl(value) {
+  const url = plainText(value);
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/uploads/')) return `${API_BASE}${url}`;
+  return url;
+}
+
+async function fetchJson(url) {
+  const response = await fetch(url, { credentials: 'include' });
+  if (!response.ok) {
+    throw new Error(`Request failed: ${response.status}`);
+  }
+  return response.json();
+}
+
+function buildCmsScreens(theme, module) {
+  const screens = [];
+  const summary = plainText(module.summary) || plainText(theme.description);
+  const body = plainText(module.body);
+  const imageUrl = resolveMediaUrl(module.imageUrl);
+  const videoUrl = resolveMediaUrl(module.videoUrl);
+  const challengeText = plainText(module.challengeText);
+
+  screens.push({
+    type:'definition',
+    heading:escapeHtml(module.title),
+    body:escapeHtml(summary || body || 'Open this module to work through the published workshop material.')
+  });
+
+  if (imageUrl) {
+    screens.push({
+      type:'image',
+      heading:escapeHtml(module.title),
+      imageUrl:escapeHtml(imageUrl),
+      imageAltText:escapeHtml(module.imageAltText || module.title)
+    });
+  }
+
+  if (body && body !== summary) {
+    screens.push({
+      type:'learning',
+      body:escapeHtml(body)
+    });
+  }
+
+  if (videoUrl) {
+    screens.push({
+      type:'video',
+      heading:'Watch',
+      url:escapeHtml(videoUrl),
+      videoTitle:escapeHtml(module.title),
+      videoSub:'Open the media for this module'
+    });
+  }
+
+  if (challengeText) {
+    screens.push({
+      type:'activity',
+      heading:'Challenge',
+      activity:escapeHtml(challengeText)
+    });
+  }
+
+  return screens;
+}
+
+function isCmsIntroductionModule(theme, module) {
+  const themeTitle = plainText(theme.title).toLowerCase();
+  const moduleTitle = plainText(module.title).toLowerCase();
+
+  return (
+    (themeTitle === 'start here' || themeTitle === 'introduction') &&
+    moduleTitle.includes('best version of me')
+  );
+}
+
+function buildCmsContent(themeGroups) {
+  let cmsIntroduction = null;
+  const modules = [];
+  const themes = themeGroups
+    .map((theme, themeIndex) => {
+      const themeModules = theme.modules
+        .map((module, moduleIndex) => {
+        const isIntroduction = isCmsIntroductionModule(theme, module);
+        const modulePosition = modules.length;
+        const color = CMS_CARD_COLORS[modulePosition % CMS_CARD_COLORS.length];
+        const publicModule = {
+          id:`cms-module-${module.id}`,
+          apiId:module.id,
+          themeId:theme.id,
+          themeTitle:theme.title,
+          title:module.title,
+          subtitle:isIntroduction ? 'Introduction' : theme.title,
+          description:module.summary || theme.description || '',
+          icon:String(modulePosition + 1).padStart(2, '0'),
+          cardClass:`card-${(modulePosition % 6) + 1}`,
+          color:color.color,
+          colorLight:color.colorLight,
+          screens:buildCmsScreens(theme, module)
+        };
+
+        if (isIntroduction && !cmsIntroduction) {
+          cmsIntroduction = publicModule;
+          return null;
+        }
+
+        modules.push(publicModule);
+        return publicModule;
+      })
+      .filter(Boolean);
+
+      return {
+        id:`cms-theme-${theme.id}`,
+        title:theme.title,
+        description:theme.description,
+        sortOrder:theme.sortOrder,
+        modules:themeModules
+      };
+    })
+    .filter(theme => theme.modules.length > 0);
+
+  if (!cmsIntroduction && modules.length === 0) return null;
+
+  return {
+    source:'cms',
+    introduction:cmsIntroduction || BVM_DATA.introduction,
+    modules,
+    themes
+  };
+}
+
+async function loadCmsContent() {
+  const themes = await fetchJson(`${API_BASE}/api/content/themes`);
+  if (!Array.isArray(themes) || themes.length === 0) return null;
+
+  const themeGroups = await Promise.all(
+    themes.map(async (theme) => ({
+      ...theme,
+      modules:await fetchJson(`${API_BASE}/api/content/themes/${theme.id}/modules`)
+    }))
+  );
+
+  return buildCmsContent(themeGroups);
+}
+
+function renderCmsModuleCard(module) {
+  return `
+    <button class="module-card ${module.cardClass}" data-module-id="${module.id}" onclick="openModule('${module.id}')">
+      <div class="module-icon">${escapeHtml(module.icon)}</div>
+      <div class="module-num">${escapeHtml(module.subtitle)}</div>
+      <div class="module-title">${escapeHtml(module.title)}</div>
+      <p class="module-desc">${escapeHtml(module.description || 'Workshop module')}</p>
+      <div class="module-footer">
+        <span class="module-tag">Module</span>
+        <span class="module-arrow">&rarr;</span>
+      </div>
+    </button>
+  `;
+}
+
+function renderPublicDashboard() {
+  if (publicContent.source !== 'cms') return;
+
+  const sectionTitle = document.querySelector('#modules-section h2');
+  const modulesContainer = document.querySelector('#modules-section + .modules-grid, #modules-section + .modules-cms');
+  const statNumbers = document.querySelectorAll('.hero-stats .stat-num');
+  const statLabels = document.querySelectorAll('.hero-stats .stat-label');
+  const introCard = document.querySelector('.intro-card');
+  const introTitle = introCard?.querySelector('.intro-card-title');
+  const introDesc = introCard?.querySelector('.intro-card-desc');
+
+  if (sectionTitle) sectionTitle.textContent = 'Workshop Themes';
+  if (statNumbers[0]) statNumbers[0].textContent = String(publicContent.modules.length);
+  if (statLabels[0]) statLabels[0].textContent = publicContent.modules.length === 1 ? 'Module' : 'Modules';
+
+  if (introCard) {
+    introCard.dataset.moduleId = publicContent.introduction.id;
+    introCard.onclick = () => openModule(publicContent.introduction.id);
+  }
+  if (introTitle) introTitle.textContent = publicContent.introduction.title;
+  if (introDesc) introDesc.textContent = publicContent.introduction.description || 'Start the workshop here.';
+
+  if (!modulesContainer) return;
+
+  modulesContainer.className = 'modules-cms';
+  modulesContainer.innerHTML = publicContent.themes
+    .map((theme) => `
+      <section class="theme-group">
+        <div class="theme-group-header">
+          <div class="theme-group-title">${escapeHtml(theme.title)}</div>
+          ${theme.description ? `<p class="theme-group-desc">${escapeHtml(theme.description)}</p>` : ''}
+        </div>
+        <div class="theme-group-grid">
+          ${theme.modules.map(renderCmsModuleCard).join('')}
+        </div>
+      </section>
+    `)
+    .join('');
+}
 
 function createEmptyPublicProgress() {
   return { version: 1, modules: {} };
@@ -975,13 +1209,13 @@ function clearPublicProgress() {
 }
 
 function getModuleById(id) {
-  return id === 'introduction'
-    ? BVM_DATA.introduction
-    : BVM_DATA.modules.find(m => m.id === id);
+  return id === publicContent.introduction.id
+    ? publicContent.introduction
+    : publicContent.modules.find(m => m.id === id);
 }
 
 function getPublicModuleIds() {
-  return ['introduction', ...BVM_DATA.modules.map(m => m.id)];
+  return [publicContent.introduction.id, ...publicContent.modules.map(m => m.id)];
 }
 
 function clampScreenIndex(moduleData, screenIndex) {
@@ -1062,9 +1296,8 @@ function resetPublicProgress() {
 }
 
 function openModule(id) {
-  currentModule = id === 'introduction'
-    ? BVM_DATA.introduction
-    : BVM_DATA.modules.find(m => m.id === id);
+  currentModule = getModuleById(id);
+  if (!currentModule) return;
   trackPageView(`/module/${id}`, currentModule.title);
   const savedProgress = readPublicProgress().modules[id];
   currentScreen = clampScreenIndex(currentModule, savedProgress?.lastScreen || 0);
@@ -1163,10 +1396,19 @@ function buildScreen(s) {
 
     case 'definition':
       return `
-        <div class="screen-eyebrow">${currentModule.subtitle} — ${currentModule.title}</div>
+        <div class="screen-eyebrow">${currentModule.subtitle} - ${currentModule.title}</div>
         <h1 class="screen-heading">${s.heading}</h1>
         <div class="screen-divider"></div>
         <p class="screen-body">${s.body}</p>`;
+
+    case 'image':
+      return `
+        <div class="screen-eyebrow">${currentModule.subtitle} - ${currentModule.title}</div>
+        <h1 class="screen-heading" style="font-size:1.8rem;margin-bottom:20px;">${s.heading}</h1>
+        <figure class="screen-image-card">
+          <img src="${s.imageUrl}" alt="${s.imageAltText || ''}">
+          ${s.imageAltText ? `<figcaption class="screen-image-caption">${s.imageAltText}</figcaption>` : ''}
+        </figure>`;
 
     case 'video':
       return `
@@ -1338,10 +1580,10 @@ function buildScreen(s) {
 // ══════════════════════════════════════════════════════
 function showComplete() {
   completePublicModule(currentModule.id);
-  const allIds = ['introduction', ...BVM_DATA.modules.map(m=>m.id)];
+  const allIds = getPublicModuleIds();
   const idx = allIds.indexOf(currentModule.id);
   const nextId = allIds[idx+1] || null;
-  const nextMod = nextId ? (nextId==='introduction' ? BVM_DATA.introduction : BVM_DATA.modules.find(m=>m.id===nextId)) : null;
+  const nextMod = nextId ? getModuleById(nextId) : null;
 
   const el = document.getElementById('screen-content');
   el.style.animation='none'; void el.offsetHeight; el.style.animation='';
@@ -1384,7 +1626,7 @@ function goTo(i) {
 
 async function trackPageView(pagePath, pageTitle) {
   try {
-    await fetch("http://localhost:8080/api/activity/page-view", {
+    await fetch(`${API_BASE}/api/activity/page-view`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -1401,8 +1643,23 @@ async function trackPageView(pagePath, pageTitle) {
   }
 }
 
-trackPageView("/", "Home");
-renderPublicProgressOverview();
+async function initPublicApp() {
+  trackPageView("/", "Home");
+
+  try {
+    const cmsContent = await loadCmsContent();
+    if (cmsContent) {
+      publicContent = cmsContent;
+      renderPublicDashboard();
+    }
+  } catch (error) {
+    console.warn("CMS content failed to load; using embedded workshop content.", error);
+  }
+
+  renderPublicProgressOverview();
+}
+
+initPublicApp();
 </script>
 </body>
 </html>

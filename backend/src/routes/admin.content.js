@@ -8,6 +8,29 @@ import { isMediaReference } from "../utils/media.js";
 
 const router = Router();
 
+function toPublishedFlag(value) {
+  return value ? 1 : 0;
+}
+
+function normalizeTheme(row) {
+  return {
+    ...row,
+    published: row.published === true || row.published === 1 || row.published === "1"
+  };
+}
+
+function normalizeModule(row) {
+  return {
+    ...row,
+    published: row.published === true || row.published === 1 || row.published === "1"
+  };
+}
+
+function parseId(value) {
+  const id = Number(value);
+  return Number.isInteger(id) && id > 0 ? id : null;
+}
+
 const themeSchema = z.object({
   title: z.string().trim().min(1).max(255),
   description: z.string().trim().max(5000).optional().default(""),
@@ -53,7 +76,7 @@ router.get("/themes", async (req, res, next) => {
       `
     );
 
-    res.json(rows);
+    res.json(rows.map(normalizeTheme));
   } catch (error) {
     next(error);
   }
@@ -61,12 +84,17 @@ router.get("/themes", async (req, res, next) => {
 
 router.post("/themes", validate(themeSchema), async (req, res, next) => {
   try {
+    const payload = {
+      ...req.body,
+      published: toPublishedFlag(req.body.published)
+    };
+
     const result = await execute(
       `
       INSERT INTO themes (title, description, sort_order, published)
       VALUES (:title, :description, :sortOrder, :published)
       `,
-      req.body
+      payload
     );
 
     res.status(201).json({
@@ -80,7 +108,16 @@ router.post("/themes", validate(themeSchema), async (req, res, next) => {
 
 router.put("/themes/:id", validate(themeSchema), async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ message: "Invalid theme id" });
+    }
+
+    const payload = {
+      id,
+      ...req.body,
+      published: toPublishedFlag(req.body.published)
+    };
 
     await execute(
       `
@@ -91,13 +128,38 @@ router.put("/themes/:id", validate(themeSchema), async (req, res, next) => {
           published = :published
       WHERE id = :id
       `,
-      { id, ...req.body }
+      payload
     );
 
     res.json({
       id,
       ...req.body
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/themes/:id", async (req, res, next) => {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ message: "Invalid theme id" });
+    }
+
+    const result = await execute(
+      `
+      DELETE FROM themes
+      WHERE id = :id
+      `,
+      { id }
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Theme not found" });
+    }
+
+    res.json({ ok: true, id });
   } catch (error) {
     next(error);
   }
@@ -119,7 +181,7 @@ router.get("/modules", async (req, res, next) => {
       `
     );
 
-    res.json(rows);
+    res.json(rows.map(normalizeModule));
   } catch (error) {
     next(error);
   }
@@ -127,6 +189,11 @@ router.get("/modules", async (req, res, next) => {
 
 router.post("/modules", validate(moduleSchema), async (req, res, next) => {
   try {
+    const payload = {
+      ...req.body,
+      published: toPublishedFlag(req.body.published)
+    };
+
     const result = await execute(
       `
       INSERT INTO modules (
@@ -138,7 +205,7 @@ router.post("/modules", validate(moduleSchema), async (req, res, next) => {
         :challengeText, :sortOrder, :published
       )
       `,
-      req.body
+      payload
     );
 
     res.status(201).json({
@@ -152,7 +219,16 @@ router.post("/modules", validate(moduleSchema), async (req, res, next) => {
 
 router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ message: "Invalid module id" });
+    }
+
+    const payload = {
+      id,
+      ...req.body,
+      published: toPublishedFlag(req.body.published)
+    };
 
     await execute(
       `
@@ -169,13 +245,38 @@ router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
         published = :published
       WHERE id = :id
       `,
-      { id, ...req.body }
+      payload
     );
 
     res.json({
       id,
       ...req.body
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.delete("/modules/:id", async (req, res, next) => {
+  try {
+    const id = parseId(req.params.id);
+    if (!id) {
+      return res.status(400).json({ message: "Invalid module id" });
+    }
+
+    const result = await execute(
+      `
+      DELETE FROM modules
+      WHERE id = :id
+      `,
+      { id }
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Module not found" });
+    }
+
+    res.json({ ok: true, id });
   } catch (error) {
     next(error);
   }

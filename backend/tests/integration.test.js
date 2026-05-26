@@ -258,6 +258,7 @@ test("admin content APIs manage themes and modules and public content exposes pu
     published: false
   });
   assert.equal(createDraftTheme.status, 201);
+  const draftTheme = await createDraftTheme.json();
 
   const uploadImageResponse = await uploadAsset({
     cookie,
@@ -295,6 +296,24 @@ test("admin content APIs manage themes and modules and public content exposes pu
   });
   assert.equal(createModule.status, 201);
   const module = await createModule.json();
+
+  const uploadsList = await adminJson("GET", "/api/admin/uploads", cookie);
+  assert.equal(uploadsList.status, 200);
+  const uploadsListBody = await uploadsList.json();
+  const listedImage = uploadsListBody.images.find(
+    (item) => item.url === uploadedImage.imageUrl
+  );
+  const listedVideo = uploadsListBody.videos.find(
+    (item) => item.url === uploadedVideo.videoUrl
+  );
+  assert.ok(listedImage, "expected uploaded image to appear in media library");
+  assert.ok(listedVideo, "expected uploaded video to appear in media library");
+  assert.deepEqual(listedImage.referencedBy, [
+    { id: module.id, title: "Know Yourself" }
+  ]);
+  assert.deepEqual(listedVideo.referencedBy, [
+    { id: module.id, title: "Know Yourself" }
+  ]);
 
   const createDraftModule = await adminJson("POST", "/api/admin/modules", cookie, {
     themeId: theme.id,
@@ -367,6 +386,53 @@ test("admin content APIs manage themes and modules and public content exposes pu
     `${baseUrl}/api/content/modules/${draftModule.id}`
   );
   assert.equal(hiddenModule.status, 404);
+
+  const unpublishModule = await adminJson("PUT", `/api/admin/modules/${module.id}`, cookie, {
+    themeId: theme.id,
+    title: "Know Yourself Better",
+    summary: "Updated module summary",
+    body: "Updated module body",
+    imageUrl: uploadedImage.imageUrl,
+    imageAltText: "Updated illustration",
+    videoUrl: uploadedVideo.videoUrl,
+    challengeText: "Updated reflection",
+    sortOrder: 1,
+    published: false
+  });
+  assert.equal(unpublishModule.status, 200);
+
+  const unpublishedModule = await fetch(`${baseUrl}/api/content/modules/${module.id}`);
+  assert.equal(unpublishedModule.status, 404);
+
+  const adminModulesAfterUnpublish = await adminJson("GET", "/api/admin/modules", cookie);
+  assert.equal(adminModulesAfterUnpublish.status, 200);
+  const adminModulesAfterUnpublishBody = await adminModulesAfterUnpublish.json();
+  assert.equal(
+    adminModulesAfterUnpublishBody.find((item) => item.id === module.id).published,
+    false
+  );
+
+  const deleteDraftModule = await adminJson(
+    "DELETE",
+    `/api/admin/modules/${draftModule.id}`,
+    cookie
+  );
+  assert.equal(deleteDraftModule.status, 200);
+
+  const deleteDraftTheme = await adminJson(
+    "DELETE",
+    `/api/admin/themes/${draftTheme.id}`,
+    cookie
+  );
+  assert.equal(deleteDraftTheme.status, 200);
+
+  const adminModulesAfterDelete = await adminJson("GET", "/api/admin/modules", cookie);
+  assert.equal(adminModulesAfterDelete.status, 200);
+  const adminModulesAfterDeleteBody = await adminModulesAfterDelete.json();
+  assert.equal(
+    adminModulesAfterDeleteBody.some((item) => item.id === draftModule.id),
+    false
+  );
 });
 
 test("survey definition API, anonymous submissions, and admin reporting summary all work", async () => {

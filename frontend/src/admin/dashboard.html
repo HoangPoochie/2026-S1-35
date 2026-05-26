@@ -86,7 +86,11 @@
           Upload image
           <input id="module-image-file" type="file" accept="image/jpeg,image/png,image/webp">
         </label>
-        <button type="button" id="upload-image-button">Upload Image</button>
+        <div class="form-actions">
+          <button type="button" id="upload-image-button">Upload Image</button>
+          <button type="button" id="clear-image-file-button">Clear Selected Image</button>
+          <button type="button" id="clear-image-path-button">Clear Image Path</button>
+        </div>
         <label>
           Video URL or upload path
           <input id="module-video-url" type="text" placeholder="https://... or /uploads/videos/...">
@@ -95,7 +99,11 @@
           Upload video
           <input id="module-video-file" type="file" accept="video/mp4,video/webm,video/quicktime,video/ogg">
         </label>
-        <button type="button" id="upload-video-button">Upload Video</button>
+        <div class="form-actions">
+          <button type="button" id="upload-video-button">Upload Video</button>
+          <button type="button" id="clear-video-file-button">Clear Selected Video</button>
+          <button type="button" id="clear-video-path-button">Clear Video Path</button>
+        </div>
         <label>
           Challenge text
           <textarea id="module-challenge-text" rows="3"></textarea>
@@ -114,6 +122,23 @@
         </div>
       </form>
     </div>
+
+    <h3>Uploaded Media Library</h3>
+    <p class="admin-help">Uploaded files remain on the server even if a module path is cleared. Use this list to reuse existing uploads and see whether modules still reference them.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Path</th>
+          <th>Size</th>
+          <th>Referenced By</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="uploads-body">
+        <tr><td colspan="5">Loading...</td></tr>
+      </tbody>
+    </table>
 
     <h3>Existing Themes</h3>
     <table>

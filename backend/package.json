@@ -10,7 +10,8 @@
     "start": "node src/server.js",
     "format": "prettier -w .",
     "test": "node tests/integration.test.js",
-    "migrate": "node src/db/migrate.js"
+    "migrate": "node src/db/migrate.js",
+    "seed:bvm": "node src/db/seed-bvm-content.js"
   },
   "keywords": [],
   "author": "",

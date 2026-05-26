@@ -8,6 +8,7 @@ export const endpoints = {
   adminContent: `${API_BASE}/api/admin/content`,
   adminThemes: `${API_BASE}/api/admin/themes`,
   adminModules: `${API_BASE}/api/admin/modules`,
+  adminUploads: `${API_BASE}/api/admin/uploads`,
   adminUploadImage: `${API_BASE}/api/admin/uploads/image`,
   adminUploadVideo: `${API_BASE}/api/admin/uploads/video`,
   adminReports: `${API_BASE}/api/admin/reports`,

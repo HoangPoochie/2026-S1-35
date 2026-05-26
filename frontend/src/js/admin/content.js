@@ -3,6 +3,7 @@ import { endpoints } from "../api/endpoints.js";
 
 let themes = [];
 let modules = [];
+let uploads = { images: [], videos: [] };
 
 const contentMessage = document.getElementById("content-message");
 const themeForm = document.getElementById("theme-form");
@@ -36,6 +37,10 @@ function getChecked(id) {
   return Boolean(document.getElementById(id)?.checked);
 }
 
+function isPublished(value) {
+  return value === true || value === 1 || value === "1";
+}
+
 function setValue(id, value) {
   const input = document.getElementById(id);
   if (input) input.value = value ?? "";
@@ -44,6 +49,19 @@ function setValue(id, value) {
 function setChecked(id, value) {
   const input = document.getElementById(id);
   if (input) input.checked = Boolean(value);
+}
+
+function clearFileInput(id) {
+  const input = document.getElementById(id);
+  if (input) input.value = "";
+}
+
+function formatBytes(bytes) {
+  const value = Number(bytes);
+  if (!Number.isFinite(value) || value <= 0) return "-";
+  if (value < 1024) return `${value} B`;
+  if (value < 1024 * 1024) return `${Math.round(value / 1024)} KB`;
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function themePayload() {
@@ -114,9 +132,12 @@ function renderThemes() {
       (theme) => `
         <tr>
           <td>${escapeHtml(theme.title)}</td>
-          <td>${theme.published ? "Yes" : "No"}</td>
+          <td>${isPublished(theme.published) ? "Yes" : "No"}</td>
           <td>${theme.sortOrder}</td>
-          <td><button type="button" data-edit-theme="${theme.id}">Edit</button></td>
+          <td>
+            <button type="button" data-edit-theme="${theme.id}">Edit</button>
+            <button type="button" data-delete-theme="${theme.id}">Delete</button>
+          </td>
         </tr>
       `
     )
@@ -140,12 +161,49 @@ function renderModules() {
         <tr>
           <td>${escapeHtml(module.title)}</td>
           <td>${escapeHtml(themeNames.get(module.themeId) || "-")}</td>
-          <td>${module.published ? "Yes" : "No"}</td>
+          <td>${isPublished(module.published) ? "Yes" : "No"}</td>
           <td>${module.sortOrder}</td>
-          <td><button type="button" data-edit-module="${module.id}">Edit</button></td>
+          <td>
+            <button type="button" data-edit-module="${module.id}">Edit</button>
+            <button type="button" data-delete-module="${module.id}">Delete</button>
+          </td>
         </tr>
       `
     )
+    .join("");
+}
+
+function renderUploads() {
+  const tbody = document.getElementById("uploads-body");
+  if (!tbody) return;
+
+  const allUploads = [
+    ...(uploads.images || []),
+    ...(uploads.videos || [])
+  ].sort((a, b) => String(b.modifiedAt).localeCompare(String(a.modifiedAt)));
+
+  if (allUploads.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No uploads yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = allUploads
+    .map((item) => {
+      const references = item.referencedBy?.length
+        ? item.referencedBy.map((module) => escapeHtml(module.title)).join(", ")
+        : "Not used";
+      const useTarget = item.type === "image" ? "image" : "video";
+
+      return `
+        <tr>
+          <td>${item.type === "image" ? "Image" : "Video"}</td>
+          <td><code>${escapeHtml(item.url)}</code></td>
+          <td>${formatBytes(item.size)}</td>
+          <td>${references}</td>
+          <td><button type="button" data-use-upload="${escapeHtml(item.url)}" data-use-upload-type="${useTarget}">Use</button></td>
+        </tr>
+      `;
+    })
     .join("");
 }
 
@@ -153,14 +211,16 @@ async function loadContent() {
   if (!themeForm || !moduleForm) return;
 
   try {
-    [themes, modules] = await Promise.all([
+    [themes, modules, uploads] = await Promise.all([
       apiFetch(endpoints.adminThemes),
-      apiFetch(endpoints.adminModules)
+      apiFetch(endpoints.adminModules),
+      apiFetch(endpoints.adminUploads)
     ]);
 
     renderThemeOptions();
     renderThemes();
     renderModules();
+    renderUploads();
   } catch (error) {
     setMessage(error.message, true);
   }
@@ -174,7 +234,7 @@ function editTheme(id) {
   setValue("theme-title", theme.title);
   setValue("theme-description", theme.description);
   setValue("theme-sort-order", theme.sortOrder);
-  setChecked("theme-published", theme.published);
+  setChecked("theme-published", isPublished(theme.published));
 }
 
 function editModule(id) {
@@ -191,7 +251,55 @@ function editModule(id) {
   setValue("module-video-url", module.videoUrl);
   setValue("module-challenge-text", module.challengeText);
   setValue("module-sort-order", module.sortOrder);
-  setChecked("module-published", module.published);
+  setChecked("module-published", isPublished(module.published));
+}
+
+async function deleteTheme(id) {
+  const theme = themes.find((item) => item.id === Number(id));
+  if (!theme) return;
+
+  const confirmed = window.confirm(
+    `Delete theme "${theme.title}"? This also deletes its modules.`
+  );
+  if (!confirmed) return;
+
+  try {
+    await apiFetch(`${endpoints.adminThemes}/${id}`, {
+      method: "DELETE"
+    });
+
+    if (getValue("theme-id") === String(id)) {
+      resetThemeForm();
+    }
+
+    setMessage("Theme deleted.");
+    await loadContent();
+  } catch (error) {
+    setMessage(error.message, true);
+  }
+}
+
+async function deleteModule(id) {
+  const module = modules.find((item) => item.id === Number(id));
+  if (!module) return;
+
+  const confirmed = window.confirm(`Delete module "${module.title}"?`);
+  if (!confirmed) return;
+
+  try {
+    await apiFetch(`${endpoints.adminModules}/${id}`, {
+      method: "DELETE"
+    });
+
+    if (getValue("module-id") === String(id)) {
+      resetModuleForm();
+    }
+
+    setMessage("Module deleted.");
+    await loadContent();
+  } catch (error) {
+    setMessage(error.message, true);
+  }
 }
 
 async function uploadMedia({ inputId, endpoint, fieldName, responseKey, targetInputId }) {
@@ -213,7 +321,9 @@ async function uploadMedia({ inputId, endpoint, fieldName, responseKey, targetIn
     });
 
     setValue(targetInputId, result[responseKey]);
+    clearFileInput(inputId);
     setMessage("Upload complete. Save the module to keep this media.");
+    await loadContent();
   } catch (error) {
     setMessage(error.message, true);
   }
@@ -274,6 +384,18 @@ document.getElementById("upload-image-button")?.addEventListener("click", () => 
   });
 });
 
+document.getElementById("clear-image-file-button")?.addEventListener("click", () => {
+  clearFileInput("module-image-file");
+  setMessage("Selected image cleared.");
+});
+
+document.getElementById("clear-image-path-button")?.addEventListener("click", () => {
+  setValue("module-image-url", "");
+  setValue("module-image-alt-text", "");
+  clearFileInput("module-image-file");
+  setMessage("Image path cleared. Save the module to remove it from this module.");
+});
+
 document.getElementById("upload-video-button")?.addEventListener("click", () => {
   uploadMedia({
     inputId: "module-video-file",
@@ -284,9 +406,41 @@ document.getElementById("upload-video-button")?.addEventListener("click", () => 
   });
 });
 
+document.getElementById("clear-video-file-button")?.addEventListener("click", () => {
+  clearFileInput("module-video-file");
+  setMessage("Selected video cleared.");
+});
+
+document.getElementById("clear-video-path-button")?.addEventListener("click", () => {
+  setValue("module-video-url", "");
+  clearFileInput("module-video-file");
+  setMessage("Video path cleared. Save the module to remove it from this module.");
+});
+
 document.addEventListener("click", (event) => {
   const themeButton = event.target.closest("[data-edit-theme]");
   const moduleButton = event.target.closest("[data-edit-module]");
+  const deleteThemeButton = event.target.closest("[data-delete-theme]");
+  const deleteModuleButton = event.target.closest("[data-delete-module]");
+  const useUploadButton = event.target.closest("[data-use-upload]");
+
+  if (useUploadButton) {
+    const type = useUploadButton.dataset.useUploadType;
+    const url = useUploadButton.dataset.useUpload;
+    setValue(type === "image" ? "module-image-url" : "module-video-url", url);
+    setMessage(`${type === "image" ? "Image" : "Video"} path selected. Save the module to keep it.`);
+    return;
+  }
+
+  if (deleteThemeButton) {
+    deleteTheme(deleteThemeButton.dataset.deleteTheme);
+    return;
+  }
+
+  if (deleteModuleButton) {
+    deleteModule(deleteModuleButton.dataset.deleteModule);
+    return;
+  }
 
   if (themeButton) {
     editTheme(themeButton.dataset.editTheme);

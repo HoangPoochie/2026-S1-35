@@ -241,7 +241,14 @@ tbody td {
   padding: 11px 16px;
   color: var(--text-body);
   border-bottom: 1px solid var(--slate-pale);
+  vertical-align: top;
 }
 
 tbody tr:last-child td { border-bottom: none; }
 tbody tr:hover td { background: var(--slate-pale); }
+
+tbody code {
+  white-space: normal;
+  word-break: break-all;
+  color: var(--teal-deep);
+}

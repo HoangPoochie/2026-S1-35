@@ -59,10 +59,13 @@ Open a terminal at the repository root:
 cd backend
 npm install
 npm run migrate
+npm run seed:bvm
 npm run dev
 ```
 
 `npm run dev` uses nodemon polling mode so it works reliably from WSL on Windows-mounted paths such as `/mnt/c/...`.
+
+`npm run seed:bvm` inserts or updates the default Best Version of Me workshop content in the CMS tables. Run it after migrations on a fresh database so the public homepage is populated from CMS-managed themes and modules.
 
 If you are running from a normal Linux/macOS filesystem and want native file watching instead, use:
 
