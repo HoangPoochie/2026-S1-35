@@ -928,7 +928,33 @@ const BVM_DATA = {
     {id: 'leadership', title: 'Leadership',
       icon:'🧘', color: '#3A8FA3', colorLight: '#D6EFF5',
       screens: [
-        //add screens for leadership module in future update
+        // leadership learning
+        {type: 'learning',
+          heading: "What is Leadership?",
+          body: "Leadership is the ability to guide, inspire, and support others in a postive way"},
+        // leadership activity
+        {type:'activity',
+           heading: "Who's a Good Leader?",
+           activity: 'Think of your favourite leaders or important people in your life.',
+           activity: 'Now think about what qualities they have that make them good leaders.'
+        },
+        //leadership skills
+        {type: 'skills-overview',
+          heading: "6 Skills for Good Leadership",
+          items: [
+            {icon: '👣', name: "Leading by Example", desc: "Your actions speak louder than anything you say."},
+            {icon: '🧭', name: "Sharing a Direction", desc: "Helping a group understand where you're headed and why."},
+            {icon: '🔥', name: "Motivating Others", desc: "Bringing energy, encouragement, and trust to the people around you."},
+            {icon: '✅', name: "Owning Decisions", desc: "Making the call, and standing by it - good or bad."},
+            {icon: '💬', name: "Communicating Clearly", desc: "Getting your message across so people actually understand it."},
+            {icon: '🧘', name: "Staying calm under pressure", desc: "Keeping a level head when things get tense, so others can too."}
+          ]          
+        },
+        // leadership journal
+        {type:'journal',
+          heading: "BVM Jounrnal Entry",
+          body: "Please open your BVM Journal, write your name and then go to page 19 and fill out the blank spots using the promts"
+        }
      ]
     }
   ] // end modules
