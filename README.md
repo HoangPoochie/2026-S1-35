@@ -31,6 +31,9 @@ Additionally:
 - Backend API: http://localhost:8080
 - MySQL: localhost:3307
 
+The frontend calls the API through same-origin `/api/...` URLs. In Docker,
+Vite proxies those requests to the backend service automatically.
+
 
 ## To stop the app:
 

@@ -23,6 +23,26 @@ const app = express();
 
 app.set("trust proxy", 1);
 
+const corsOrigins = new Set(
+  String(env.CORS_ORIGIN || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean)
+);
+
+corsOrigins.add("http://localhost:5173");
+corsOrigins.add("http://127.0.0.1:5173");
+corsOrigins.add("http://0.0.0.0:5173");
+
+function allowCorsOrigin(origin, callback) {
+  if (!origin || corsOrigins.has(origin)) {
+    callback(null, true);
+    return;
+  }
+
+  callback(null, false);
+}
+
 app.use(
   helmet({
     crossOriginResourcePolicy: false
@@ -31,7 +51,7 @@ app.use(
 
 app.use(
   cors({
-    origin: env.CORS_ORIGIN,
+    origin: allowCorsOrigin,
     credentials: true
   })
 );
