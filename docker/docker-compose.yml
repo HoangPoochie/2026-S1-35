@@ -35,7 +35,7 @@ services:
       DB_NAME: bvom
       DB_USER: bvom_user
       DB_PASSWORD: bvom_pass
-      CORS_ORIGIN: "http://localhost:5173"
+      CORS_ORIGIN: "http://localhost:5173,${TUNNEL_URL}"
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: change_me_now
       SESSION_SECRET: replace_with_a_long_random_secret
@@ -63,6 +63,15 @@ services:
     volumes:
       - ../frontend:/app
       - /app/node_modules
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - frontend
 
 volumes:
   mysql_data:
