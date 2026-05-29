@@ -215,7 +215,18 @@ async function upsertModule(themeId, module) {
   return result.insertId;
 }
 
+async function hasExistingContent() {
+  const rows = await query("SELECT 1 FROM themes LIMIT 1");
+  return rows.length > 0;
+}
+
 async function run() {
+  if (await hasExistingContent()) {
+    logger.info("Database already has content, skipping seed.");
+    await pool.end();
+    return;
+  }
+
   for (const theme of programContent) {
     const themeId = await upsertTheme(theme);
 
