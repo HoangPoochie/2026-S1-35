@@ -1113,7 +1113,7 @@ function buildCmsContent(themeGroups) {
     })
     .filter(theme => theme.modules.length > 0);
 
-  if (!cmsIntroduction && modules.length === 0) return null;
+  if (modules.length === 0) return null;
 
   return {
     source:'cms',
