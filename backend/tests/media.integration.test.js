@@ -95,6 +95,28 @@ test("module schema accepts local uploaded media paths", () => {
     challengeText: "Reflection prompt",
     sortOrder: 0,
     published: false,
+    pages: [
+      {
+        pageType: "text",
+        title: "First page",
+        body: "This is manually page-broken text.",
+        sortOrder: 0
+      },
+      {
+        pageType: "image",
+        title: "Image page",
+        mediaUrl: "/uploads/images/example.png",
+        mediaAltText: "An example image",
+        sortOrder: 1
+      },
+      {
+        pageType: "video",
+        title: "Video page",
+        mediaUrl: "/uploads/videos/example.mp4",
+        mediaAltText: "An example video",
+        sortOrder: 2
+      }
+    ],
     mediaItems: [
       {
         mediaType: "image",

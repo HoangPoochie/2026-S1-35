@@ -980,7 +980,73 @@ async function fetchJson(url) {
   return response.json();
 }
 
+function buildCmsScreenFromPage(theme, module, page) {
+  if (page.content && typeof page.content === 'object') {
+    const screen = { ...page.content };
+    if (screen.imageUrl) {
+      screen.imageUrl = escapeHtml(resolveMediaUrl(screen.imageUrl));
+    }
+    if (screen.url) {
+      screen.url = escapeHtml(resolveMediaUrl(screen.url));
+    }
+    return screen;
+  }
+
+  const pageType = plainText(page.pageType) || 'text';
+  const title = plainText(page.title);
+  const body = plainText(page.body);
+  const mediaUrl = resolveMediaUrl(page.mediaUrl);
+  const mediaAltText = plainText(page.mediaAltText);
+
+  if (pageType === 'image') {
+    if (!mediaUrl) return null;
+    return {
+      type:'image',
+      heading:escapeHtml(title || module.title),
+      imageUrl:escapeHtml(mediaUrl),
+      imageAltText:escapeHtml(mediaAltText || title || module.title)
+    };
+  }
+
+  if (pageType === 'video') {
+    if (!mediaUrl) return null;
+    return {
+      type:'video',
+      heading:escapeHtml(title || 'Watch'),
+      url:escapeHtml(mediaUrl),
+      videoTitle:escapeHtml(mediaAltText || title || module.title),
+      videoSub:escapeHtml(body || 'Open the media for this module')
+    };
+  }
+
+  if (pageType === 'activity') {
+    return {
+      type:'activity',
+      heading:escapeHtml(title || 'Activity'),
+      activity:escapeHtml(body || 'Complete this activity with your group.')
+    };
+  }
+
+  return {
+    type:'definition',
+    heading:escapeHtml(title || module.title),
+    body:escapeHtml(body || module.summary || theme.description || 'Open this page to work through the published workshop material.')
+  };
+}
+
 function buildCmsScreens(theme, module) {
+  const manualPages = Array.isArray(module.pages)
+    ? module.pages
+        .slice()
+        .sort((a, b) => Number(a.sortOrder || 0) - Number(b.sortOrder || 0))
+        .map((page) => buildCmsScreenFromPage(theme, module, page))
+        .filter(Boolean)
+    : [];
+
+  if (manualPages.length > 0) {
+    return manualPages;
+  }
+
   const screens = [];
   const summary = plainText(module.summary) || plainText(theme.description);
   const body = plainText(module.body);

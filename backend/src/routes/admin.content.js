@@ -5,6 +5,7 @@ import { query, execute, withTransaction } from "../db/index.js";
 import { requireAdmin } from "../middleware/auth.js";
 import { validate } from "../middleware/validate.js";
 import { ensureModuleMediaSchema } from "../db/moduleMediaSchema.js";
+import { ensureModulePageSchema } from "../db/modulePageSchema.js";
 import { isMediaReference } from "../utils/media.js";
 
 const router = Router();
@@ -24,7 +25,8 @@ function normalizeModule(row) {
   return {
     ...row,
     published: row.published === true || row.published === 1 || row.published === "1",
-    mediaItems: row.mediaItems || []
+    mediaItems: row.mediaItems || [],
+    pages: row.pages || []
   };
 }
 
@@ -40,6 +42,31 @@ function normalizeMediaItem(row) {
     mediaType: row.mediaType,
     url: row.url,
     altText: row.altText || "",
+    sortOrder: row.sortOrder
+  };
+}
+
+function parsePageContent(value) {
+  if (!value) return null;
+  if (typeof value === "object") return value;
+
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+function normalizePage(row) {
+  return {
+    id: row.id,
+    moduleId: row.moduleId,
+    pageType: row.pageType || "text",
+    title: row.title || "",
+    body: row.body || "",
+    mediaUrl: row.mediaUrl || "",
+    mediaAltText: row.mediaAltText || "",
+    content: parsePageContent(row.contentJson),
     sortOrder: row.sortOrder
   };
 }
@@ -72,6 +99,38 @@ async function loadMediaItemsForModules(moduleIds) {
   }
 
   return mediaByModule;
+}
+
+async function loadPagesForModules(moduleIds) {
+  await ensureModulePageSchema();
+
+  const ids = [...new Set(moduleIds.map(Number).filter((id) => id > 0))];
+
+  if (ids.length === 0) {
+    return new Map();
+  }
+
+  const placeholders = ids.map(() => "?").join(",");
+  const rows = await query(
+    `
+    SELECT id, module_id AS moduleId, page_type AS pageType, title, body,
+      media_url AS mediaUrl, media_alt_text AS mediaAltText,
+      content_json AS contentJson,
+      sort_order AS sortOrder
+    FROM module_pages
+    WHERE module_id IN (${placeholders})
+    ORDER BY module_id ASC, sort_order ASC, id ASC
+    `,
+    ids
+  );
+
+  const pagesByModule = new Map(ids.map((id) => [id, []]));
+
+  for (const row of rows) {
+    pagesByModule.get(Number(row.moduleId))?.push(normalizePage(row));
+  }
+
+  return pagesByModule;
 }
 
 function legacyMediaItemsFromPayload(payload) {
@@ -117,6 +176,21 @@ function normalizePayloadMediaItems(payload) {
     .sort((a, b) => a.sortOrder - b.sortOrder);
 }
 
+function normalizePayloadPages(payload) {
+  return (Array.isArray(payload.pages) ? payload.pages : [])
+    .map((page, index) => ({
+      pageType: String(page.pageType || page.content?.type || "text").trim() || "text",
+      title: page.title || "",
+      body: page.body || "",
+      mediaUrl: page.mediaUrl || "",
+      mediaAltText: page.mediaAltText || "",
+      content: page.content && typeof page.content === "object" ? page.content : null,
+      sortOrder: Number.isInteger(page.sortOrder) ? page.sortOrder : index
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((page, index) => ({ ...page, sortOrder: index }));
+}
+
 function modulePayloadForDb(payload, mediaItems) {
   const firstImage = mediaItems.find((item) => item.mediaType === "image");
   const firstVideo = mediaItems.find((item) => item.mediaType === "video");
@@ -131,8 +205,6 @@ function modulePayloadForDb(payload, mediaItems) {
 }
 
 async function replaceModuleMedia(conn, moduleId, mediaItems) {
-  await ensureModuleMediaSchema();
-
   await conn.execute("DELETE FROM module_media WHERE module_id = ?", [moduleId]);
 
   for (const [index, item] of mediaItems.entries()) {
@@ -152,15 +224,44 @@ async function replaceModuleMedia(conn, moduleId, mediaItems) {
   }
 }
 
-async function attachMediaItems(modules) {
-  const mediaByModule = await loadMediaItemsForModules(
-    modules.map((module) => module.id)
-  );
+async function replaceModulePages(conn, moduleId, pages) {
+  await conn.execute("DELETE FROM module_pages WHERE module_id = ?", [moduleId]);
+
+  for (const [index, page] of pages.entries()) {
+    await conn.execute(
+      `
+      INSERT INTO module_pages (
+        module_id, page_type, title, body, media_url, media_alt_text,
+        content_json, sort_order
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `,
+      [
+        moduleId,
+        page.pageType,
+        page.title || "",
+        page.body || "",
+        page.mediaUrl || "",
+        page.mediaAltText || "",
+        page.content ? JSON.stringify(page.content) : null,
+        Number.isInteger(page.sortOrder) ? page.sortOrder : index
+      ]
+    );
+  }
+}
+
+async function attachModuleCollections(modules) {
+  const moduleIds = modules.map((module) => module.id);
+  const [mediaByModule, pagesByModule] = await Promise.all([
+    loadMediaItemsForModules(moduleIds),
+    loadPagesForModules(moduleIds)
+  ]);
 
   return modules.map((module) =>
     normalizeModule({
       ...module,
-      mediaItems: mediaByModule.get(Number(module.id)) || []
+      mediaItems: mediaByModule.get(Number(module.id)) || [],
+      pages: pagesByModule.get(Number(module.id)) || []
     })
   );
 }
@@ -196,6 +297,57 @@ export const moduleSchema = z.object({
   challengeText: z.string().trim().max(5000).optional().default(""),
   sortOrder: z.number().int().min(0).default(0),
   published: z.boolean().default(false),
+  pages: z
+    .array(
+      z
+        .object({
+          pageType: z.string().trim().min(1).max(50).optional().default("text"),
+          title: z.string().trim().max(255).optional().default(""),
+          body: z.string().trim().max(50000).optional().default(""),
+          mediaUrl: z.string().trim().max(500).optional().default(""),
+          mediaAltText: z.string().trim().max(255).optional().default(""),
+          content: z.record(z.any()).nullable().optional().default(null),
+          sortOrder: z.number().int().min(0).default(0)
+        })
+        .superRefine((page, ctx) => {
+          if (page.content) {
+            return;
+          }
+
+          if (page.pageType === "image" || page.pageType === "video") {
+            if (!page.mediaUrl) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["mediaUrl"],
+                message: "Media URL or upload path is required for media pages."
+              });
+              return;
+            }
+
+            if (!isMediaReference(page.mediaUrl, page.pageType)) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ["mediaUrl"],
+                message:
+                  page.pageType === "image"
+                    ? "Must be an http(s) URL or a local /uploads/images/... path."
+                    : "Must be an http(s) URL or a local /uploads/videos/... path."
+              });
+            }
+            return;
+          }
+
+          if (!page.title && !page.body && !page.content) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              path: ["body"],
+              message: "Text and activity pages need a title or body."
+            });
+          }
+        })
+    )
+    .optional()
+    .default([]),
   mediaItems: z
     .array(
       z
@@ -339,7 +491,7 @@ router.get("/modules", async (req, res, next) => {
       `
     );
 
-    res.json(await attachMediaItems(rows));
+    res.json(await attachModuleCollections(rows));
   } catch (error) {
     next(error);
   }
@@ -347,7 +499,10 @@ router.get("/modules", async (req, res, next) => {
 
 router.post("/modules", validate(moduleSchema), async (req, res, next) => {
   try {
+    await ensureModuleMediaSchema();
+    await ensureModulePageSchema();
     const mediaItems = normalizePayloadMediaItems(req.body);
+    const pages = normalizePayloadPages(req.body);
     const payload = modulePayloadForDb(req.body, mediaItems);
 
     const id = await withTransaction(async (conn) => {
@@ -374,6 +529,7 @@ router.post("/modules", validate(moduleSchema), async (req, res, next) => {
       );
 
       await replaceModuleMedia(conn, result.insertId, mediaItems);
+      await replaceModulePages(conn, result.insertId, pages);
 
       return result.insertId;
     });
@@ -384,7 +540,8 @@ router.post("/modules", validate(moduleSchema), async (req, res, next) => {
       imageUrl: payload.imageUrl,
       imageAltText: payload.imageAltText,
       videoUrl: payload.videoUrl,
-      mediaItems
+      mediaItems,
+      pages
     });
   } catch (error) {
     next(error);
@@ -398,7 +555,10 @@ router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
       return res.status(400).json({ message: "Invalid module id" });
     }
 
+    await ensureModuleMediaSchema();
+    await ensureModulePageSchema();
     const mediaItems = normalizePayloadMediaItems(req.body);
+    const pages = normalizePayloadPages(req.body);
     const payload = {
       id,
       ...modulePayloadForDb(req.body, mediaItems)
@@ -436,6 +596,7 @@ router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
       );
 
       await replaceModuleMedia(conn, id, mediaItems);
+      await replaceModulePages(conn, id, pages);
     });
 
     res.json({
@@ -444,7 +605,8 @@ router.put("/modules/:id", validate(moduleSchema), async (req, res, next) => {
       imageUrl: payload.imageUrl,
       imageAltText: payload.imageAltText,
       videoUrl: payload.videoUrl,
-      mediaItems
+      mediaItems,
+      pages
     });
   } catch (error) {
     next(error);

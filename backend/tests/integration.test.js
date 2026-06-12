@@ -371,6 +371,27 @@ test("admin content APIs manage themes and modules and public content exposes pu
     challengeText: "Updated reflection",
     sortOrder: 1,
     published: true,
+    pages: [
+      {
+        pageType: "text",
+        title: "First manual page",
+        body: "Page one body",
+        sortOrder: 0
+      },
+      {
+        pageType: "image",
+        title: "Image manual page",
+        mediaUrl: uploadedImage.imageUrl,
+        mediaAltText: "Updated illustration",
+        sortOrder: 1
+      },
+      {
+        pageType: "activity",
+        title: "Reflection",
+        body: "Updated reflection",
+        sortOrder: 2
+      }
+    ],
     mediaItems: [
       {
         mediaType: "video",
@@ -403,6 +424,43 @@ test("admin content APIs manage themes and modules and public content exposes pu
   assert.equal(adminModules.status, 200);
   const adminModulesBody = await adminModules.json();
   assert.equal(adminModulesBody.length, 2);
+  const savedModule = adminModulesBody.find((item) => item.id === module.id);
+  assert.deepEqual(
+    savedModule.pages.map((page) => ({
+      pageType: page.pageType,
+      title: page.title,
+      body: page.body,
+      mediaUrl: page.mediaUrl,
+      mediaAltText: page.mediaAltText,
+      sortOrder: page.sortOrder
+    })),
+    [
+      {
+        pageType: "text",
+        title: "First manual page",
+        body: "Page one body",
+        mediaUrl: "",
+        mediaAltText: "",
+        sortOrder: 0
+      },
+      {
+        pageType: "image",
+        title: "Image manual page",
+        body: "",
+        mediaUrl: uploadedImage.imageUrl,
+        mediaAltText: "Updated illustration",
+        sortOrder: 1
+      },
+      {
+        pageType: "activity",
+        title: "Reflection",
+        body: "Updated reflection",
+        mediaUrl: "",
+        mediaAltText: "",
+        sortOrder: 2
+      }
+    ]
+  );
 
   // const publicThemes = await fetch(`${baseUrl}/api/content/themes`);
   // assert.equal(publicThemes.status, 200);
