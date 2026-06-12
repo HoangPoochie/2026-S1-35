@@ -7,6 +7,7 @@ import { uploadImage, uploadVideo } from "../middleware/upload.js";
 import env from "../config/env.js";
 import { query, withTransaction } from "../db/index.js";
 import { ensureModuleMediaSchema } from "../db/moduleMediaSchema.js";
+import { ensureModulePageSchema } from "../db/modulePageSchema.js";
 import {
   IMAGE_UPLOAD_SUBDIR,
   VIDEO_UPLOAD_SUBDIR,
@@ -39,6 +40,7 @@ function uploadConfigForType(type) {
 
 async function listUploadFiles({ subdir, type, referenceColumn }) {
   await ensureModuleMediaSchema();
+  await ensureModulePageSchema();
 
   const uploadRoot = resolveUploadDir(env.UPLOAD_DIR);
   const dir = path.join(uploadRoot, subdir);
@@ -67,8 +69,10 @@ async function listUploadFiles({ subdir, type, referenceColumn }) {
           SELECT DISTINCT m.id, m.title
           FROM modules m
           LEFT JOIN module_media mm ON mm.module_id = m.id
+          LEFT JOIN module_pages mp ON mp.module_id = m.id
           WHERE m.${referenceColumn} = :url
             OR (mm.media_type = :type AND mm.url = :url)
+            OR (mp.page_type = :type AND mp.media_url = :url)
           ORDER BY m.id ASC
           `,
           { url, type }
@@ -152,6 +156,7 @@ router.get("/uploads", async (req, res, next) => {
 router.delete("/uploads/:type/:filename", async (req, res, next) => {
   try {
     await ensureModuleMediaSchema();
+    await ensureModulePageSchema();
 
     const config = uploadConfigForType(req.params.type);
     if (!config) {
@@ -198,9 +203,18 @@ router.delete("/uploads/:type/:filename", async (req, res, next) => {
         [config.type, url]
       );
 
+      const [pageDelete] = await conn.execute(
+        `
+        DELETE FROM module_pages
+        WHERE page_type = ? AND media_url = ?
+        `,
+        [config.type, url]
+      );
+
       return {
         legacyReferencesCleared: legacyUpdate.affectedRows,
-        mediaItemsDeleted: mediaDelete.affectedRows
+        mediaItemsDeleted: mediaDelete.affectedRows,
+        pageMediaPagesDeleted: pageDelete.affectedRows
       };
     });
 

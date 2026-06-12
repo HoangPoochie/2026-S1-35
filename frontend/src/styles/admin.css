@@ -164,7 +164,8 @@ hr {
   color: var(--text-dark);
 }
 
-.media-fieldset {
+.media-fieldset,
+.page-fieldset {
   border: 1.5px solid var(--teal-light);
   border-radius: 8px;
   display: flex;
@@ -174,7 +175,8 @@ hr {
   padding: 14px;
 }
 
-.media-fieldset legend {
+.media-fieldset legend,
+.page-fieldset legend {
   color: var(--teal-deep);
   font-weight: 700;
   padding: 0 6px;
@@ -243,7 +245,8 @@ table {
   box-shadow: 0 1px 8px rgba(27, 79, 107, 0.06);
 }
 
-.media-items-table {
+.media-items-table,
+.module-pages-table {
   font-size: 0.8rem;
   box-shadow: none;
   margin-top: 4px;
