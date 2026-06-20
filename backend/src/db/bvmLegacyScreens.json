@@ -1,0 +1,780 @@
+[
+  {
+    "id": "self-awareness",
+    "title": "Self-Awareness",
+    "screens": [
+      {
+        "type": "learning",
+        "heading": "Self-Awareness",
+        "body": "Self-awareness is understanding yourself, your thoughts, feelings, and actions. It's like looking in a mirror and seeing yourself clearly, knowing what you need to work on, and how you affect others. It's a bit like being your own detective, noticing and understanding what makes you, you."
+      },
+      {
+        "type": "video",
+        "heading": "Self-Awareness",
+        "url": "https://www.google.com/url?sa=t&source=web&rct=j&opi=89978449&url=https://www.classhook.com/resources/2859-despicable-me-2-gru-and-the-nervous-phone-call&ved=2ahUKEwivmMT9nKyUAxUZjGMGHUiJFP0QtwJ6BAgTEAI&usg=AOvVaw1QkjNP6UqFYRHaggIvigGB"
+      },
+      {
+        "type": "skills-overview",
+        "heading": "Self Awareness: Our Favourite 6 skills",
+        "skills": [
+          {
+            "icon": "🤍",
+            "name": "Self-Compassion",
+            "desc": "Talk to yourself with the same kindness you would with a best friend."
+          },
+          {
+            "icon": "💭",
+            "name": "Emotional Awareness",
+            "desc": "Pay attenetion to your thoughts and feelings to understand yourself better. Name your feelings to tame your feelings."
+          },
+          {
+            "icon": "🌿",
+            "name": "Honesty",
+            "desc": "Telling the trust to yourself about how you feel and what you do."
+          },
+          {
+            "icon": "🔄",
+            "name": "Seeking Feedback",
+            "desc": "Ask for and listen to feedback from others to help you grow."
+          },
+          {
+            "icon": "🧘",
+            "name": "Mindfulness",
+            "desc": "Stay present and aware of your emotions."
+          },
+          {
+            "icon": "🔍",
+            "name": "Self-Reflection",
+            "desc": "Refelct on your experiences and learn from them to grow."
+          }
+        ]
+      },
+      {
+        "type": "journal",
+        "heading": "Self-Awareness Journal",
+        "body": "Please open your BVM Journal, write your name and then go to page #1 and rate yourself on these 6 skills. \n\n1 = low \n\n5 = high"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Compassion Web",
+        "activity": "Holding a strand of wool, shout out something you like about yourself — then throw the wool pile to someone else. But don't let go of your strand!\n\nWatch the web grow as everyone shares.",
+        "note": "Facilitator note: This visually shows connection and builds a warm, supportive atmosphere in the room."
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Self-Awareness",
+        "body": "Self-compassion isn't about being \"soft\" or making excuses. It's about treating yourself the way you'd treat a friend. Building self-compassion helps with resilience, emotional awareness, and bouncing back from mistakes."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Glow & Grow",
+        "activity": "Let's draw a picture in just 15 seconds!\n\nIf asked, give feedback using the \"Glow & Grow\" method:\n\n• GLOW → Something they did well\n• GROW → One way they could improve",
+        "note": "Facilitator note: This quick activity makes feedback feel safe and structured. Emphasise that both parts are equally important."
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Seeking Feedback",
+        "body": "Giving and receiving feedback helps us grow by recognising our strengths (\"Glows\") and areas to improve (\"Grows\"). Practising this builds self-awareness, confidence, and a mindset that sees feedback as a tool for learning — not criticism."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Compassion Web",
+        "activity": "Holding a strand of wool, shout out something you like about yourself — then throw the wool pile to someone else. But don't let go of your strand!\n\nWatch the web grow as everyone shares.",
+        "note": "Facilitator note: This visually shows connection and builds a warm, supportive atmosphere in the room."
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Self-Compassion",
+        "body": "Self-compassion isn't about being \"soft\" or making excuses. It's about treating yourself the way you'd treat a friend. Building self-compassion helps with resilience, emotional awareness, and bouncing back from mistakes."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Emotion Charades",
+        "activity": "Looking for some brave volunteers to act out an emotion on the card without using words?!"
+      },
+      {
+        "type": "learning",
+        "heading": "The Anger Iceberg",
+        "body": "In our game of emotion charades, we acted out feelings we might see on the outside\n\nThis anger Iceberg image, shows us that just 1 emotion can actually hold so much more underneath!"
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Emotional Awareness",
+        "body": "Emotional awareness helps us understand what's really going on beneath the surface. The better we understand our emotions, the better we understand ourselves and communicate with others.\n\nTake the time to name your inner feelings, to help tame them."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Line of Honesty",
+        "activity": "Answer each question by positioning yourself in the room.\n\nOne side of the line is 'Always' — the other is 'Never'"
+      },
+      {
+        "type": "scenarios",
+        "heading": "Honesty Scenarios",
+        "instruction": "Position yourself on the line — 'Always' on one side, 'Never' on the other.",
+        "scenarios": [
+          "A friend tells you a secret, but someone else asks you about it. Do you keep it private?",
+          "Your best friend tells a joke that isn't funny, but they look excited for your reaction. Do you laugh anyway?",
+          "A teacher gives you credit for something you didn't do. Do you correct them or enjoy the moment?",
+          "Your teacher asks if you like their new shoes, but you don't. Do you tell the truth?",
+          "You accidentally break something at your homestay, but no one saw. Do you admit it?",
+          "You're talking to someone and they have something stuck in their teeth. Do you tell them?",
+          "You're part of a group chat where people are being mean. Do you leave it, or report it?"
+        ]
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Honesty",
+        "body": "Practising honesty helps build self-awareness by allowing us to recognise our true feelings, take responsibility for our actions, and understand how our choices align with our values."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Ten Mindfulness Mini's",
+        "activity": "Follow along to try ten simple, quick ways to calm your mind, stay present, and reset your focus — anywhere, anytime!"
+      },
+      {
+        "type": "list",
+        "heading": "The Ten Mindfulness Mini's",
+        "items": [
+          {
+            "num": "1",
+            "label": "Posture",
+            "desc": "Sit up tall and feel grounded in your seat."
+          },
+          {
+            "num": "2",
+            "label": "Deep Breathing",
+            "desc": "Breathe in slowly through your nose, then out slowly through your mouth."
+          },
+          {
+            "num": "3",
+            "label": "Balance",
+            "desc": "Stand on one foot and find your centre."
+          },
+          {
+            "num": "4",
+            "label": "Affirmation",
+            "desc": "\"I am calm and at peace.\" Say it — mean it."
+          },
+          {
+            "num": "5",
+            "label": "Smile",
+            "desc": "Let a gentle smile come to your face, even if it feels small."
+          },
+          {
+            "num": "6",
+            "label": "Observation",
+            "desc": "Notice five things you can see right now."
+          },
+          {
+            "num": "7",
+            "label": "Colour",
+            "desc": "Find something blue in the room."
+          },
+          {
+            "num": "8",
+            "label": "Hand Tracing",
+            "desc": "Slowly trace around your fingers with the other hand."
+          },
+          {
+            "num": "9",
+            "label": "Listening",
+            "desc": "Close your eyes and notice every sound around you."
+          },
+          {
+            "num": "10",
+            "label": "Your Favourite",
+            "desc": "Which one worked best for you? Remember it."
+          }
+        ]
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Mindfulness",
+        "body": "Mindfulness helps reduce stress, enhance focus and concentration, improve emotional regulation, reduce muscle tension, and encourage a positive outlook and improved self-esteem."
+      },
+      {
+        "type": "journal",
+        "heading": "BVM Journal Entry",
+        "body": "Please complete these 3 questions on page 1"
+      },
+      {
+        "type": "learning",
+        "heading": "What We Learned: Self-Reflection",
+        "body": "Journaling helps build self-awareness by giving us space to reflect on our thoughts, feelings, and experiences. Writing things down makes it easier to recognise patterns, understand emotions, and make choices that align with our values."
+      }
+    ]
+  },
+  {
+    "id": "self-management",
+    "title": "Self Management",
+    "screens": [
+      {
+        "type": "skills-overview",
+        "heading": "Self Awareness: Our Favourite 6 skills",
+        "skills": [
+          {
+            "icon": "🎯",
+            "name": "Goal Setting",
+            "desc": "Prioritise, set goals to stay focused and organised."
+          },
+          {
+            "icon": "⏰",
+            "name": "Time Management",
+            "desc": "Use time wisely by planning and scheduling activities. Break tasks into smaller steps to make them more manageable."
+          },
+          {
+            "icon": "💪",
+            "name": "Self Motivation",
+            "desc": "Stay disciplined and motivated to follow through on commitments and tasks."
+          },
+          {
+            "icon": "🧘",
+            "name": "Stress Management",
+            "desc": "Develop strategies to cope with stress ad stay calm under pressure."
+          },
+          {
+            "icon": "📚",
+            "name": "Personal Development",
+            "desc": "Seek help or resources when needed to overcome challenges and achieve goals."
+          },
+          {
+            "icon": "🔄",
+            "name": "Adaptability",
+            "desc": "You ability to maintain confidence and pivot when changes occur. Be flexible and keep an open, curious approach."
+          }
+        ]
+      },
+      {
+        "type": "journal",
+        "heading": "BVM Journal Entry",
+        "body": "Please open your BVM Journal, write your name and then go to page #7 and rate yourself on these 6 x skills. \n\n1 = low\n\n5 = high"
+      },
+      {
+        "type": "activity",
+        "heading": "Self Management Activity: Stress Toolbox",
+        "activity": "Group 1: Write down what you feel in your body and mind when you're feeling stressed\n\nGroup 2: Write down what you do to help calm yourself down."
+      },
+      {
+        "type": "bullets",
+        "heading": "Stress Management",
+        "intro": " It is really important to:",
+        "items": [
+          "Know your stress toolbox and use it",
+          "Identify what works well for you",
+          "Understand sometimes we might need to do more than one thing",
+          "Seek help when you need it"
+        ]
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Would you rather...",
+        "activity": "Listen to the question, reflect, and then position yourself in the room to show your answer"
+      },
+      {
+        "type": "learning",
+        "heading": "Self Management: Personal Development",
+        "body": "Engaging in reflection helps us grow as people. When we understand our thoughts, feelings, and actions, we can set better goals, make better choices, and continue to become the best version of ourselves."
+      },
+      {
+        "type": "list",
+        "heading": "Why Do Goals Matter?",
+        "items": [
+          {
+            "num": "1",
+            "label": "They help us lead with purpose."
+          },
+          {
+            "num": "2",
+            "label": "When things get tricky, your goals remind you why you started."
+          },
+          {
+            "num": "3",
+            "label": "They help us grow into the leader we want to be"
+          },
+          {
+            "num": "4",
+            "label": "They turn big ideas into real actions"
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "heading": "A good goal is:",
+        "items": [
+          {
+            "num": "1",
+            "label": "Clear",
+            "desc": "You know what the aim is"
+          },
+          {
+            "num": "2",
+            "label": "Measurable",
+            "desc": "You can tell when you've achieved it"
+          },
+          {
+            "num": "3",
+            "label": "Challenging",
+            "desc": "But possible!"
+          },
+          {
+            "num": "4",
+            "label": "Timed",
+            "desc": "You have a finish date"
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "heading": "Goal Setting Examples",
+        "items": [
+          {
+            "num": "1",
+            "label": "SMART Goal Template",
+            "desc": "Helps create a clear and structured goal by making it: Specific, Measurable, Acheivable, Relevant, and Time-Bound"
+          },
+          {
+            "num": "2",
+            "label": "Goal Breakdown Template",
+            "desc": "Breaks your goal into smaller steps and explores: What you want to achieve, how to get there, what might get in the way, and your motivartion"
+          },
+          {
+            "num": "3",
+            "label": "Action Plan Template",
+            "desc": "Focuses on why the goal matters, he actions you'll take, the resources you need, and when you'll check your progress"
+          }
+        ]
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Goal Setting",
+        "activity": "This is your change to pause and thing about who you want to be this year.\n\nWhat kind of difference do you want to make?Small steps can lead to a big impact.\n\nUsing one of the goal setting templates, or your own, let's take some time to create leadership goals that are personal, positive, and practical"
+      },
+      {
+        "type": "learning",
+        "heading": "Lets share our goals",
+        "body": "Take a moment to share your goals with the group. it helps us learn from each other, stay motivated, and show support. You never know who you might inspire!"
+      },
+      {
+        "type": "learning",
+        "body": "Sharing our goals helps us practice communication, build confidence, and strengthen connections with others. When we say our goals out loud, they feel more real and it reminds us that we're not on this journey alone."
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Plane Time",
+        "activity": "Build the best paper plane you can...\n\nBut you only have 2 minutes total - you'll need to make some smart choices!\n\n \n\nWe want to see a nice looking, well performing plane!"
+      },
+      {
+        "type": "bullets",
+        "heading": "You can choose to:",
+        "items": [
+          "Read the simple folding instructions",
+          "Read folding instructions of different levels",
+          "Build without instructions",
+          "Test fly and adjust",
+          "Decorate your plane"
+        ]
+      },
+      {
+        "type": "learning",
+        "body": "Good time management means making choices, not just doing more, but doing what matters most with the time you've got!"
+      },
+      {
+        "type": "learning",
+        "heading": "Building Self-Motivation",
+        "body": "Some days you feel pumped. Other days, not so much. Self-motivation is about finding little ways to keep going, even when you don't feel like it!"
+      },
+      {
+        "type": "learning",
+        "heading": "Did you know?",
+        "body": "Even on days when you don't wake up feeling motivated. YOU CAN do things to encourage and buildd the skill of self motivation!\n\nFeeling flat and unmotivated? Use ASMR!"
+      },
+      {
+        "type": "asmr",
+        "heading": "ASMR",
+        "items": [
+          {
+            "letter": "A",
+            "title": "Ask for help",
+            "body": "Ask for help from others. Talk to a friend, teacher. Work next to someone focused. Goal buddy check-ins"
+          },
+          {
+            "letter": "S",
+            "title": "Small steps",
+            "body": "Take small steps or just the very next step. Set a timer. Break into mini steps. To do list"
+          },
+          {
+            "letter": "M",
+            "title": "Mind talk",
+            "body": "Take control of your inner voice. Positive self talk. Visualising success"
+          },
+          {
+            "letter": "R",
+            "title": "Reward",
+            "body": "Reward yourself at the end or celebrate your progress. Mini reward after task. Track progress with stickers of ticks. Do something fun when you finish"
+          }
+        ]
+      },
+      {
+        "type": "list",
+        "heading": "Which tool will work best for you?",
+        "items": [
+          {
+            "num": "1",
+            "label": "You've been asked to run part of a school assembly, but you're feeling nervous and unsure where to start."
+          },
+          {
+            "num": "2",
+            "label": "Your clss is working on a group project. But for some reason, you just don't feel like joining in."
+          },
+          {
+            "num": "3",
+            "label": "you've set a big leadership goal, but it's still weeks away and you're loosing motivation."
+          },
+          {
+            "num": "4",
+            "label": "You made a mistake last time you lead a group and now you're doubting yourself"
+          },
+          {
+            "num": "5",
+            "label": "Your coach asks you to give the pre-game address, and you're feeling pressure."
+          }
+        ]
+      },
+      {
+        "type": "learning",
+        "heading": "Leaning",
+        "body": "Self motivation isn't something you either have or don't, it's something you can build, using tools that work for you. You're not lazy or bad at something just because you feel like giving up. You might just need to try a different tool."
+      }
+    ]
+  },
+  {
+    "id": "social-awareness",
+    "title": "Social Awareness",
+    "screens": [
+      {
+        "type": "learning",
+        "heading": "Social Awareness",
+        "body": "Social awareness is like having a special rader that helps you understand what's going on with other people around you. It means being able to pick up on their feelings, needs, and thoughts. It's like tuning into the unspoken cues in a conversation or sensing when someone might need a little extra support"
+      },
+      {
+        "type": "skills-overview",
+        "heading": "Social Awareness: Our favourite 6 skills",
+        "skills": [
+          {
+            "icon": "🤍",
+            "name": "Emotional Regulation",
+            "desc": "Manage your own emotions and behaviour, so they don't nterfere with your ability to understand and respond well to others."
+          },
+          {
+            "icon": "👂",
+            "name": "Active Listening",
+            "desc": "Pay close attention to what others are saying, show interest and empathy, without interupting."
+          },
+          {
+            "icon": "🌐",
+            "name": "Perspective",
+            "desc": "Notice and respect differencees, including cultural differences, understanding that people may see things differently."
+          },
+          {
+            "icon": "🧘",
+            "name": "Stress Management",
+            "desc": "Be aware of social cues and norms in different situations to navigate them effectively"
+          },
+          {
+            "icon": "❤️",
+            "name": "Empathy",
+            "desc": "Show empathy by putting yourself in others' shoes and understanding their perspectives."
+          },
+          {
+            "icon": "👁️",
+            "name": "Observation",
+            "desc": "Recognise verbal and non-verbal signals that people use to communicate feelings, intentions, and reactions."
+          }
+        ]
+      },
+      {
+        "type": "journal",
+        "heading": "BVM Journal Entry",
+        "body": "Please open your BVM Journal, write your name and then go to page #13 and rate yourself on these 6 x skills\n\n1 = low\n\n5 = high"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: 'I didn't say he stole my money'",
+        "activity": "7 x brave volunteers\n\nPlease take turns reading this sentence and emphasising LOUDLY one word each"
+      },
+      {
+        "type": "bullets",
+        "heading": "Social Awareness: Active Listening & Observation",
+        "intro": "We don't just say things with our words, we say it with our tone of voice, our body language, and our facial expressions",
+        "items": [
+          "55% non verbal",
+          "38% vocal",
+          "7% words"
+        ]
+      },
+      {
+        "type": "perspective",
+        "heading": "Perspective Switch",
+        "intro": "Let's step into someone else's shoes and explore how different people might feel about certain situations.\n\n Let's keep it respectful and kinds, and do our best to try and understand a different perspective.",
+        "scenarios": [
+          {
+            "title": "The Group Chat Blow-Up: A message in your group chat gets misunderstood and someone feels left out. A joke turns into an argument.",
+            "views": [
+              "The person who made the joke",
+              "The person who felt hurt",
+              "A friend watching it unfold",
+              "An adult who hears about it later"
+            ]
+          },
+          {
+            "title": "Group Work: Someone in your group isn't doing their fair share of the work and seems really quiet and withdrawn.",
+            "views": [
+              "Yours",
+              "The person being quiet",
+              "Other contributing members of the team",
+              "An adult overlooking the group dynamics"
+            ]
+          },
+          {
+            "title": "No Phones at School: The school has a strict no-phones policy, and a student gets caught checking theirs between classes.",
+            "views": [
+              "The student",
+              "The teacher who caught them",
+              "A friend who saw it happen",
+              "The school principal who set the rule"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "learning",
+        "body": "Understanding another person's point of view doesn't mean we always have to agree, but it helps us communicate more respectfully, build stronger connections, and make fairer, more thoughtful decisions"
+      },
+      {
+        "type": "journal",
+        "heading": "Journal Prompt",
+        "body": "Check out page 14 in your BVM journal for helpful empathetic responses!"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Unhelpful and Helpful",
+        "activity": "Let's consider a scenario and explore what emotion could appear, an unhelpful reaction, and what a relpful response would look like"
+      },
+      {
+        "type": "emotion-scenario",
+        "title": "You post online and someone writes a mean comment",
+        "feeling": "Hurt, embarrassed, or angry",
+        "unhelpful": "Write a nasty comment back or delete post",
+        "helpful": "Take a break before responding, talk to a trusted adult or friend, remind yourself that one comment doesn't define your worth"
+      },
+      {
+        "type": "emotion-scenario",
+        "title": "Your friend tells you they don't want to hang out today",
+        "feeling": "Sad, embarrassed, or lonely",
+        "unhelpful": "Tell them you don't ever want to hang out again",
+        "helpful": "Find other people to hang out with, check if they're okay, read a book solo"
+      },
+      {
+        "type": "learning",
+        "body": "Emotional regulating means noticing your feelings and choosing how to respond, instead of just reacting. When you can manage your emotions, you think more clearly, stay clamer, and make better choices, even when things get tough."
+      }
+    ]
+  },
+  {
+    "id": "relationship-management",
+    "title": "Relationship Management",
+    "screens": [
+      {
+        "type": "learning",
+        "heading": "Relationship Management",
+        "body": "Relationship management is like being a good team captain. It's about working well with others, whether it's with friends, family, or classmates. It means communicating effectively, solving problems together, and being their for each other. It's like keeping the team spirit alive by treating everyone with kindness and respect."
+      },
+      {
+        "type": "skills-overview",
+        "heading": "Relationship Management: Our favourite 6 skills",
+        "items": [
+          {
+            "icon": "💬",
+            "name": "Communication",
+            "desc": "Communicate openly and honestly tp build trust and understanding."
+          },
+          {
+            "icon": "👂",
+            "name": "Active Listening",
+            "desc": "Show genuine interest and empathy in conversations. Give all of your attention, concentrate, undertand, respond remember."
+          },
+          {
+            "icon": "🤝",
+            "name": "Conflict Resolution",
+            "desc": "Resolve conflicts constructively by finding solutions that work for everyone involved."
+          },
+          {
+            "icon": "🏡",
+            "name": "Heathy Relationships",
+            "desc": "Set boundaries and respect others' boundaries to maintain healthy reationships."
+          },
+          {
+            "icon": "🙏",
+            "name": "Appreciation",
+            "desc": "Show appreciation and support for others, acknowledge their contributions and efforts."
+          },
+          {
+            "icon": "🔗",
+            "name": "Connect",
+            "desc": "Build connections by being reliable, dependable, and compassionate in your interactions."
+          }
+        ]
+      },
+      {
+        "type": "journal",
+        "heading": "BVM Jounrnal Entry",
+        "body": "Please open your BVM Journal, write your name and then go to page 15 and rate yoursef on these 6 x skills\n\n1 = low\n\n5 = high"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Stranded on an Island",
+        "activity": "In small groups, imagine you are stranded on an island and can only take 3 items with you. Work together to decide on the 3 items and be ready to present to the group on why you chose those items."
+      },
+      {
+        "type": "list",
+        "heading": "Choose 3 items:",
+        "items": [
+          {
+            "num": "1",
+            "label": "A box of matches"
+          },
+          {
+            "num": "2",
+            "label": "A large tarp"
+          },
+          {
+            "num": "3",
+            "label": "A hunting knife"
+          },
+          {
+            "num": "4",
+            "label": "A small fishing net"
+          },
+          {
+            "num": "5",
+            "label": "A first-aid kit"
+          },
+          {
+            "num": "6",
+            "label": "A solar-powered flashlight"
+          },
+          {
+            "num": "7",
+            "label": "6 x water purifying tablets"
+          },
+          {
+            "num": "8",
+            "label": "A mirror"
+          },
+          {
+            "num": "9",
+            "label": "A heavy duty rope"
+          },
+          {
+            "num": "10",
+            "label": "A map of the area"
+          },
+          {
+            "num": "11",
+            "label": "A box of 48 energy bars"
+          },
+          {
+            "num": "12",
+            "label": "A radio with imited battery"
+          },
+          {
+            "num": "13",
+            "label": "A flare gun with two flares"
+          },
+          {
+            "num": "14",
+            "label": "A swiss army knife"
+          },
+          {
+            "num": "15",
+            "label": "A sleeping bag"
+          },
+          {
+            "num": "16",
+            "label": "A pet parrot that can mimic words"
+          },
+          {
+            "num": "17",
+            "label": "A guitar"
+          },
+          {
+            "num": "18",
+            "label": "3 x small tarps"
+          }
+        ]
+      },
+      {
+        "type": "scenarios",
+        "heading": "Debrief Questions",
+        "scenarios": [
+          "Did everyone agree on the final decision?",
+          "How did you hanfle differences of opinion?",
+          "Did everyone get a change to share their ideas?",
+          "If someone was quiet or unsure, did anyone invite them into the conversation?",
+          "Was it easy or hard to listen to each other? Why?",
+          "How did your team deal with any disagreements?",
+          "Did you feel heard and respected by the group?"
+        ]
+      },
+      {
+        "type": "learning",
+        "heading": "Relationship Management: What We Learned",
+        "body": "Relationship management is about working well with others, even when we don't all agree. Communicating clearly, listening respectfully, and understand different points of view.\n\nWhen we build healthy relationships, we feel more connected, we work better as a team, and we learn to appreciate the strengths and ideas that others bring."
+      }
+    ]
+  },
+  {
+    "id": "values",
+    "title": "Values-CharacterTraits-&-Strengths",
+    "screens": [
+      {
+        "type": "activity",
+        "heading": "Consider your own Values, Traits, and Strengths.",
+        "activity": "Read through the words on page 18 and highlight t3 words per list that best describe you"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Create Your Statement",
+        "activity": "Now, choose 1 word from each list to create a statement about you.\n\nI value FAMILY, I am a CREATIVE person, and one of my strengths is UNDERSTANDING FEELINGS"
+      },
+      {
+        "type": "activity",
+        "heading": "Activity: Share Your Statement",
+        "activity": "Pair up with the person opposite you. find a place to site and share. Please share your statement with them and reflect on how your statement feels/connects with you"
+      },
+      {
+        "type": "scenarios",
+        "heading": "Values Scenarios",
+        "instruction": "Reflect on each question, then share with the group",
+        "scenarios": [
+          "A Genie in a bottle appears and grants you 3 wishes. What do you wish for?",
+          "If you could send a message to everyone on earth, what would it be?",
+          "Would you rather speak in front of the whole school OR have a difficult one-one-one conversation?",
+          "Would you rather be a leader who inspires people OR one who gets things done?",
+          "Would you rather be the captain of a team that loses OR a team member of a team that wins?",
+          "Would you rather loudly lead a team from the front OR support quietly behind the scenes?"
+        ]
+      },
+      {
+        "type": "learning",
+        "heading": "What we learned",
+        "body": "Understanding ourselves helps us recognise what truly matters to us. By identifying and sharing our values, traits, and strengths we learn how our choices, actions, and relationships align with what we stand for."
+      }
+    ]
+  },
+  {
+    "id": "leadership",
+    "title": "Leadership",
+    "screens": []
+  }
+]

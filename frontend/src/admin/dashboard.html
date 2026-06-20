@@ -74,6 +74,58 @@
           Body
           <textarea id="module-body" rows="5"></textarea>
         </label>
+        <fieldset class="page-fieldset">
+          <legend>Manual module pages</legend>
+          <p class="admin-help">Add one page for each public screen. If no pages are saved, the module still uses summary, media, body, and challenge as a fallback.</p>
+          <label>
+            Page type
+            <select id="module-page-type">
+              <option value="text">Text page</option>
+              <option value="activity">Activity</option>
+              <option value="image">Image</option>
+              <option value="video">Video</option>
+            </select>
+          </label>
+          <label>
+            Page title
+            <input id="module-page-title" type="text">
+          </label>
+          <label>
+            Page body / prompt
+            <textarea id="module-page-body" rows="4"></textarea>
+          </label>
+          <label>
+            Media URL or upload path
+            <input id="module-page-media-url" type="text" placeholder="https://... or /uploads/images/...">
+          </label>
+          <label>
+            Media caption / alt text
+            <input id="module-page-media-alt-text" type="text">
+          </label>
+          <label>
+            Sort order
+            <input id="module-page-sort-order" type="number" min="0" value="0">
+          </label>
+          <div class="form-actions">
+            <button type="button" id="add-module-page-button">Add Page</button>
+            <button type="button" id="reset-module-page-button">Clear Page Draft</button>
+          </div>
+
+          <table class="module-pages-table">
+            <thead>
+              <tr>
+                <th>Sort</th>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Preview</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="module-pages-body">
+              <tr><td colspan="5">No manual pages added</td></tr>
+            </tbody>
+          </table>
+        </fieldset>
         <fieldset class="media-fieldset">
           <legend>Module media</legend>
           <label>
@@ -190,12 +242,13 @@
           <th>Title</th>
           <th>Theme</th>
           <th>Published</th>
+          <th>Pages</th>
           <th>Sort</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody id="modules-body">
-        <tr><td colspan="5">Loading...</td></tr>
+        <tr><td colspan="6">Loading...</td></tr>
       </tbody>
     </table>
 

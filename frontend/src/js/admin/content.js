@@ -5,6 +5,14 @@ let themes = [];
 let modules = [];
 let uploads = { images: [], videos: [] };
 let moduleMediaItems = [];
+let modulePages = [];
+
+const pageTypeLabels = {
+  text: "Text",
+  activity: "Activity",
+  image: "Image",
+  video: "Video"
+};
 
 const contentMessage = document.getElementById("content-message");
 const themeForm = document.getElementById("theme-form");
@@ -80,6 +88,24 @@ function normalizeMediaItems(items = []) {
     .map((item, index) => ({ ...item, sortOrder: index }));
 }
 
+function normalizeModulePages(pages = []) {
+  return pages
+    .filter((page) => page && (page.title || page.body || page.mediaUrl || page.content))
+    .map((page, index) => ({
+      pageType: String(page.pageType || page.content?.type || "text").trim() || "text",
+      title: String(page.title || "").trim(),
+      body: String(page.body || "").trim(),
+      mediaUrl: String(page.mediaUrl || "").trim(),
+      mediaAltText: String(page.mediaAltText || "").trim(),
+      content: page.content && typeof page.content === "object" ? page.content : null,
+      sortOrder: Number.isInteger(Number(page.sortOrder))
+        ? Number(page.sortOrder)
+        : index
+    }))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((page, index) => ({ ...page, sortOrder: index }));
+}
+
 function legacyMediaItemsFromModule(module) {
   const items = [];
 
@@ -102,6 +128,180 @@ function legacyMediaItemsFromModule(module) {
   }
 
   return items;
+}
+
+function legacyPagesFromModule(module) {
+  const pages = [];
+
+  if (module.summary) {
+    pages.push({
+      pageType: "text",
+      title: module.title,
+      body: module.summary,
+      sortOrder: pages.length
+    });
+  }
+
+  const mediaItems = normalizeMediaItems(
+    module.mediaItems?.length ? module.mediaItems : legacyMediaItemsFromModule(module)
+  );
+
+  mediaItems.forEach((item) => {
+    pages.push({
+      pageType: item.mediaType,
+      title: item.altText || module.title,
+      body: "",
+      mediaUrl: item.url,
+      mediaAltText: item.altText || "",
+      sortOrder: pages.length
+    });
+  });
+
+  if (module.body && module.body !== module.summary) {
+    pages.push({
+      pageType: "text",
+      title: "What we learned",
+      body: module.body,
+      sortOrder: pages.length
+    });
+  }
+
+  if (module.challengeText) {
+    pages.push({
+      pageType: "activity",
+      title: "Challenge",
+      body: module.challengeText,
+      sortOrder: pages.length
+    });
+  }
+
+  return pages;
+}
+
+function resetPageDraft() {
+  setValue("module-page-type", "text");
+  setValue("module-page-title", "");
+  setValue("module-page-body", "");
+  setValue("module-page-media-url", "");
+  setValue("module-page-media-alt-text", "");
+  setValue("module-page-sort-order", String(modulePages.length));
+}
+
+function setPageDraft({
+  pageType = "text",
+  title = "",
+  body = "",
+  mediaUrl = "",
+  mediaAltText = "",
+  sortOrder
+} = {}) {
+  setValue("module-page-type", pageType);
+  setValue("module-page-title", title);
+  setValue("module-page-body", body);
+  setValue("module-page-media-url", mediaUrl);
+  setValue("module-page-media-alt-text", mediaAltText);
+  setValue(
+    "module-page-sort-order",
+    String(Number.isInteger(Number(sortOrder)) ? Number(sortOrder) : modulePages.length)
+  );
+}
+
+function renderModulePages() {
+  const tbody = document.getElementById("module-pages-body");
+  if (!tbody) return;
+
+  modulePages = normalizeModulePages(modulePages);
+
+  if (modulePages.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5">No manual pages added</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = modulePages
+    .map((page, index) => {
+      const richContent = page.content || {};
+      const previewSource =
+        page.pageType === "image" || page.pageType === "video"
+          ? page.mediaUrl
+          : page.body || richContent.body || richContent.activity || richContent.instruction;
+      const preview = previewSource
+        ? `${previewSource.slice(0, 90)}${previewSource.length > 90 ? "..." : ""}`
+        : "-";
+
+      return `
+        <tr>
+          <td>${index}</td>
+          <td>${pageTypeLabels[page.pageType] || page.pageType || "Text"}</td>
+          <td>${escapeHtml(page.title || richContent.heading || richContent.title || "-")}</td>
+          <td>${escapeHtml(preview)}</td>
+          <td>
+            <button type="button" data-move-page="${index}" data-move-page-dir="-1">Up</button>
+            <button type="button" data-move-page="${index}" data-move-page-dir="1">Down</button>
+            <button type="button" data-edit-page="${index}">Edit</button>
+            <button type="button" data-remove-page="${index}">Remove</button>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function addModulePageFromDraft() {
+  const pageType = getValue("module-page-type");
+  const title = getValue("module-page-title");
+  const body = getValue("module-page-body");
+  const mediaUrl = getValue("module-page-media-url");
+  const mediaAltText = getValue("module-page-media-alt-text");
+  const sortOrder = getNumberValue("module-page-sort-order");
+
+  if ((pageType === "image" || pageType === "video") && !mediaUrl) {
+    setMessage("Add a media URL or upload path for this media page.", true);
+    return;
+  }
+
+  if (pageType !== "image" && pageType !== "video" && !title && !body) {
+    setMessage("Add a title or body for this page.", true);
+    return;
+  }
+
+  modulePages.push({
+    pageType,
+    title,
+    body,
+    mediaUrl,
+    mediaAltText,
+    sortOrder
+  });
+  modulePages = normalizeModulePages(modulePages);
+  renderModulePages();
+  resetPageDraft();
+  setMessage("Page added. Save the module to keep the page list.");
+}
+
+function removeModulePage(index) {
+  modulePages.splice(index, 1);
+  modulePages = normalizeModulePages(modulePages);
+  renderModulePages();
+  resetPageDraft();
+  setMessage("Page removed. Save the module to keep this change.");
+}
+
+function editModulePage(index) {
+  const page = modulePages[index];
+  if (!page) return;
+  setPageDraft({ ...page, sortOrder: index });
+}
+
+function moveModulePage(index, direction) {
+  const nextIndex = index + direction;
+  if (nextIndex < 0 || nextIndex >= modulePages.length) return;
+
+  const [page] = modulePages.splice(index, 1);
+  modulePages.splice(nextIndex, 0, page);
+  modulePages = normalizeModulePages(modulePages);
+  renderModulePages();
+  resetPageDraft();
+  setMessage("Page order changed. Save the module to keep this order.");
 }
 
 function resetMediaDraft() {
@@ -221,6 +421,7 @@ function modulePayload() {
     challengeText: getValue("module-challenge-text"),
     sortOrder: getNumberValue("module-sort-order"),
     published: getChecked("module-published"),
+    pages: normalizeModulePages(modulePages),
     mediaItems
   };
 }
@@ -241,6 +442,9 @@ function resetModuleForm() {
   setValue("module-challenge-text", "");
   setValue("module-sort-order", "0");
   setChecked("module-published", false);
+  modulePages = [];
+  renderModulePages();
+  resetPageDraft();
   moduleMediaItems = [];
   renderModuleMediaItems();
   resetMediaDraft();
@@ -286,7 +490,7 @@ function renderModules() {
   if (!tbody) return;
 
   if (modules.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5">No modules yet</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6">No modules yet</td></tr>';
     return;
   }
 
@@ -299,6 +503,7 @@ function renderModules() {
           <td>${escapeHtml(module.title)}</td>
           <td>${escapeHtml(themeNames.get(module.themeId) || "-")}</td>
           <td>${isPublished(module.published) ? "Yes" : "No"}</td>
+          <td>${module.pages?.length || 0}</td>
           <td>${module.sortOrder}</td>
           <td>
             <button type="button" data-edit-module="${module.id}">Edit</button>
@@ -339,6 +544,7 @@ function renderUploads() {
           <td>${references}</td>
           <td>
             <button type="button" data-use-upload="${escapeHtml(item.url)}" data-use-upload-type="${useTarget}">Use</button>
+            <button type="button" data-use-upload-page="${escapeHtml(item.url)}" data-use-upload-page-type="${useTarget}">Use in Page</button>
             <button type="button" data-delete-upload="${escapeHtml(item.filename)}" data-delete-upload-type="${useTarget}" data-delete-upload-url="${escapeHtml(item.url)}">Delete</button>
           </td>
         </tr>
@@ -389,6 +595,11 @@ function editModule(id) {
   setValue("module-challenge-text", module.challengeText);
   setValue("module-sort-order", module.sortOrder);
   setChecked("module-published", isPublished(module.published));
+  modulePages = normalizeModulePages(
+    module.pages?.length ? module.pages : legacyPagesFromModule(module)
+  );
+  renderModulePages();
+  resetPageDraft();
   moduleMediaItems = normalizeMediaItems(
     module.mediaItems?.length ? module.mediaItems : legacyMediaItemsFromModule(module)
   );
@@ -457,6 +668,8 @@ async function deleteUpload({ type, filename, url }) {
     });
 
     moduleMediaItems = moduleMediaItems.filter((item) => item.url !== url);
+    modulePages = modulePages.filter((page) => page.mediaUrl !== url);
+    renderModulePages();
     renderModuleMediaItems();
     resetMediaDraft();
     setMessage(`${label[0].toUpperCase()}${label.slice(1)} upload deleted.`);
@@ -544,6 +757,11 @@ moduleForm?.addEventListener("submit", async (event) => {
 
 document.getElementById("theme-reset")?.addEventListener("click", resetThemeForm);
 document.getElementById("module-reset")?.addEventListener("click", resetModuleForm);
+document.getElementById("add-module-page-button")?.addEventListener("click", addModulePageFromDraft);
+document.getElementById("reset-module-page-button")?.addEventListener("click", () => {
+  resetPageDraft();
+  setMessage("Page draft cleared.");
+});
 
 document.getElementById("upload-image-button")?.addEventListener("click", () => {
   uploadMedia({
@@ -591,6 +809,28 @@ document.addEventListener("click", (event) => {
   const removeMediaButton = event.target.closest("[data-remove-media]");
   const editMediaButton = event.target.closest("[data-edit-media]");
   const moveMediaButton = event.target.closest("[data-move-media]");
+  const removePageButton = event.target.closest("[data-remove-page]");
+  const editPageButton = event.target.closest("[data-edit-page]");
+  const movePageButton = event.target.closest("[data-move-page]");
+  const useUploadPageButton = event.target.closest("[data-use-upload-page]");
+
+  if (movePageButton) {
+    moveModulePage(
+      Number(movePageButton.dataset.movePage),
+      Number(movePageButton.dataset.movePageDir)
+    );
+    return;
+  }
+
+  if (editPageButton) {
+    editModulePage(Number(editPageButton.dataset.editPage));
+    return;
+  }
+
+  if (removePageButton) {
+    removeModulePage(Number(removePageButton.dataset.removePage));
+    return;
+  }
 
   if (moveMediaButton) {
     moveMediaItem(
@@ -616,6 +856,14 @@ document.addEventListener("click", (event) => {
       filename: deleteUploadButton.dataset.deleteUpload,
       url: deleteUploadButton.dataset.deleteUploadUrl
     });
+    return;
+  }
+
+  if (useUploadPageButton) {
+    const type = useUploadPageButton.dataset.useUploadPageType;
+    const url = useUploadPageButton.dataset.useUploadPage;
+    setPageDraft({ pageType: type, mediaUrl: url, title: type === "image" ? "Image" : "Video" });
+    setMessage(`${type === "image" ? "Image" : "Video"} path selected for a manual page. Add the page, then save the module.`);
     return;
   }
 
@@ -647,6 +895,8 @@ document.addEventListener("click", (event) => {
   }
 });
 
+renderModulePages();
+resetPageDraft();
 renderModuleMediaItems();
 resetMediaDraft();
 loadContent();

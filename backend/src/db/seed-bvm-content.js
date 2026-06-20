@@ -1,5 +1,16 @@
+import fs from "fs/promises";
+import { fileURLToPath } from "url";
 import pool, { execute, query } from "./index.js";
+import { ensureModulePageSchema } from "./modulePageSchema.js";
 import logger from "../utils/logger.js";
+
+const legacyScreensUrl = new URL("./bvmLegacyScreens.json", import.meta.url);
+const legacyScreens = JSON.parse(
+  await fs.readFile(fileURLToPath(legacyScreensUrl), "utf8")
+);
+const legacyScreensById = new Map(
+  legacyScreens.map((module) => [module.id, module])
+);
 
 const programContent = [
   {
@@ -30,6 +41,7 @@ const programContent = [
     published: true,
     modules: [
       {
+        legacyId: "self-awareness",
         title: "Self-Awareness",
         summary:
           "Understanding your own emotions, thoughts, and behaviours, and how they affect yourself and others.",
@@ -41,6 +53,7 @@ const programContent = [
         published: true
       },
       {
+        legacyId: "self-management",
         title: "Self Management",
         summary:
           "Controlling your emotions, behaviours, and actions to stay focused on your goals.",
@@ -52,6 +65,7 @@ const programContent = [
         published: true
       },
       {
+        legacyId: "social-awareness",
         title: "Social Awareness",
         summary:
           "Understanding how other people feel and what's happening in the world around you.",
@@ -63,6 +77,7 @@ const programContent = [
         published: true
       },
       {
+        legacyId: "relationship-management",
         title: "Relationship Management",
         summary:
           "Effective relationships are built on communication, empathy, and trust.",
@@ -74,6 +89,7 @@ const programContent = [
         published: true
       },
       {
+        legacyId: "values",
         title: "Values, Character Traits, & Strengths",
         summary:
           "Values = what matters most to you. Character Traits = who you are. Strengths = what you're good at.",
@@ -85,6 +101,7 @@ const programContent = [
         published: true
       },
       {
+        legacyId: "leadership",
         title: "Leadership",
         summary:
           "The ability to guide, inspire, and support others in a positive way.",
@@ -215,23 +232,168 @@ async function upsertModule(themeId, module) {
   return result.insertId;
 }
 
-async function hasExistingContent() {
-  const rows = await query("SELECT 1 FROM themes LIMIT 1");
-  return rows.length > 0;
+async function modulePagesCount(moduleId) {
+  const rows = await query(
+    `
+    SELECT COUNT(*) AS pageCount
+    FROM module_pages
+    WHERE module_id = :moduleId
+    `,
+    { moduleId }
+  );
+
+  return Number(rows[0]?.pageCount || 0);
+}
+
+async function modulePageStats(moduleId) {
+  const rows = await query(
+    `
+    SELECT COUNT(*) AS pageCount,
+      SUM(CASE WHEN content_json IS NULL THEN 0 ELSE 1 END) AS richPageCount
+    FROM module_pages
+    WHERE module_id = :moduleId
+    `,
+    { moduleId }
+  );
+
+  return {
+    pageCount: Number(rows[0]?.pageCount || 0),
+    richPageCount: Number(rows[0]?.richPageCount || 0)
+  };
+}
+
+async function insertModulePage(moduleId, page) {
+  await execute(
+    `
+    INSERT INTO module_pages (
+      module_id, page_type, title, body, media_url, media_alt_text,
+      content_json, sort_order
+    )
+    VALUES (
+      :moduleId, :pageType, :title, :body, :mediaUrl, :mediaAltText,
+      :contentJson, :sortOrder
+    )
+    `,
+    {
+      moduleId,
+      pageType: page.pageType,
+      title: page.title || "",
+      body: page.body || "",
+      mediaUrl: page.mediaUrl || "",
+      mediaAltText: page.mediaAltText || "",
+      contentJson: page.content ? JSON.stringify(page.content) : null,
+      sortOrder: page.sortOrder
+    }
+  );
+}
+
+function titleFromScreen(screen, fallback) {
+  return screen.heading || screen.title || screen.videoTitle || fallback;
+}
+
+function bodyFromScreen(screen) {
+  return screen.body || screen.activity || screen.instruction || screen.intro || "";
+}
+
+function mediaUrlFromScreen(screen) {
+  return screen.imageUrl || screen.url || "";
+}
+
+function mediaAltTextFromScreen(screen) {
+  return screen.imageAltText || screen.videoTitle || screen.heading || "";
+}
+
+async function seedLegacyModulePages(moduleId, module) {
+  const legacyModule = legacyScreensById.get(module.legacyId);
+  const screens = legacyModule?.screens || [];
+
+  if (screens.length === 0) {
+    return false;
+  }
+
+  const { pageCount, richPageCount } = await modulePageStats(moduleId);
+  const hasOnlyCompressedPages = richPageCount === 0 && pageCount <= 3;
+
+  if (!hasOnlyCompressedPages) {
+    return false;
+  }
+
+  await execute(
+    `
+    DELETE FROM module_pages
+    WHERE module_id = :moduleId
+    `,
+    { moduleId }
+  );
+
+  for (const [index, screen] of screens.entries()) {
+    await insertModulePage(moduleId, {
+      pageType: screen.type || "text",
+      title: titleFromScreen(screen, module.title),
+      body: bodyFromScreen(screen),
+      mediaUrl: mediaUrlFromScreen(screen),
+      mediaAltText: mediaAltTextFromScreen(screen),
+      content: screen,
+      sortOrder: index
+    });
+  }
+
+  logger.info(`Seeded legacy screens for module: ${module.title}`, {
+    pages: screens.length
+  });
+
+  return true;
+}
+
+async function seedDefaultModulePages(moduleId, module) {
+  if ((await modulePagesCount(moduleId)) > 0) {
+    return;
+  }
+
+  const pages = [
+    module.summary
+      ? {
+          pageType: "text",
+          title: module.title,
+          body: module.summary,
+          sortOrder: 0
+        }
+      : null,
+    module.body && module.body !== module.summary
+      ? {
+          pageType: "text",
+          title: "What we learned",
+          body: module.body,
+          sortOrder: 1
+        }
+      : null,
+    module.challengeText
+      ? {
+          pageType: "activity",
+          title: "Challenge",
+          body: module.challengeText,
+          sortOrder: 2
+        }
+      : null
+  ].filter(Boolean);
+
+  for (const [index, page] of pages.entries()) {
+    await insertModulePage(moduleId, { ...page, sortOrder: index });
+  }
 }
 
 async function run() {
-  if (await hasExistingContent()) {
-    logger.info("Database already has content, skipping seed.");
-    await pool.end();
-    return;
-  }
+  await ensureModulePageSchema();
 
   for (const theme of programContent) {
     const themeId = await upsertTheme(theme);
 
     for (const module of theme.modules) {
-      await upsertModule(themeId, module);
+      const moduleId = await upsertModule(themeId, module);
+      const seededLegacyPages = await seedLegacyModulePages(moduleId, module);
+      if (!seededLegacyPages) {
+        await seedDefaultModulePages(moduleId, module);
+      }
     }
 
     logger.info(`Seeded CMS theme: ${theme.title}`);
