@@ -5,6 +5,8 @@ export const endpoints = {
   adminLogin: `${API_BASE}/api/admin/login`,
   adminLogout: `${API_BASE}/api/admin/logout`,
   adminMe: `${API_BASE}/api/admin/me`,
+  adminChangePassword: "/api/admin/change-password",
+  adminRecoverPassword: "/api/admin/recover-password",
   adminContent: `${API_BASE}/api/admin/content`,
   adminThemes: `${API_BASE}/api/admin/themes`,
   adminModules: `${API_BASE}/api/admin/modules`,

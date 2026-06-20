@@ -35,9 +35,11 @@ services:
       DB_NAME: bvom
       DB_USER: bvom_user
       DB_PASSWORD: bvom_pass
-      CORS_ORIGIN: "http://localhost:5173,${TUNNEL_URL}"
+      CORS_ORIGIN: "http://localhost:5173"
+      # CORS_ORIGIN: "http://localhost:5173,${TUNNEL_URL}"
       ADMIN_USERNAME: admin
       ADMIN_PASSWORD: change_me_now
+      ADMIN_RECOVERY_KEY: bvom-recovery-2026-x7J9qP2mL8vR4sT6nW3kY1zA
       SESSION_SECRET: replace_with_a_long_random_secret
       TEST_DB_HOST: mysql
       TEST_DB_PORT: 3306
@@ -64,14 +66,14 @@ services:
       - ../frontend:/app
       - /app/node_modules
 
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    restart: unless-stopped
-    command: tunnel --no-autoupdate run
-    environment:
-      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
-    depends_on:
-      - frontend
+  # cloudflared:
+  #   image: cloudflare/cloudflared:latest
+  #   restart: unless-stopped
+  #   command: tunnel --no-autoupdate run
+  #   environment:
+  #     TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+  #   depends_on:
+  #     - frontend
 
 volumes:
   mysql_data:

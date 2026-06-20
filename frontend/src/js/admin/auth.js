@@ -24,6 +24,26 @@ export async function getCurrentAdmin() {
   });
 }
 
+export async function changeAdminPassword(currentPassword, newPassword) {
+  return apiFetch(endpoints.adminChangePassword, {
+    method: "PATCH",
+    body: JSON.stringify({
+      currentPassword,
+      newPassword
+    })
+  });
+}
+
+export async function recoverAdminPassword(recoveryKey, newPassword) {
+  return apiFetch(endpoints.adminRecoverPassword, {
+    method: "PATCH",
+    body: JSON.stringify({
+      recoveryKey,
+      newPassword
+    })
+  });
+}
+
 export function redirectToAdminLogin() {
   if (sessionTimeoutTimer) {
     clearTimeout(sessionTimeoutTimer);
