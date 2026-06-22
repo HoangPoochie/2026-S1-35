@@ -232,7 +232,7 @@ router.post(
     return res.json({
       ok: true,
       message: "Journal PDF uploaded successfully.",
-      path: "/uploads/documents/journal.pdf"
+      path: "/uploads/journal.pdf"
     });
   }
 );

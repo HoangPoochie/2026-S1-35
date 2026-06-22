@@ -85,7 +85,7 @@ export const uploadVideo = createUpload({
 });
 
 export const uploadJournalPdf = createUpload({
-  subdir: "documents",
+  subdir: "",
   allowedMimeTypes: pdfMimeTypes,
   errorMessage: "Only PDF files are allowed.",
   maxUploadMb: env.MAX_UPLOAD_MB,
