@@ -31,11 +31,31 @@
       <p>Avg Views/Day: <strong id="avg-views">-</strong></p>
     </div>
 
+    <h2>Journal PDF</h2>
+    <p class="admin-help">
+      Upload a new BVM Journal PDF. This will replace the current downloadable journal on the public website.
+    </p>
+
+    <form id="journal-form" class="admin-form">
+      <label>
+        Upload Journal PDF
+        <input id="journal-pdf-file" type="file" accept="application/pdf" required>
+      </label>
+
+      <div class="form-actions">
+        <button type="submit" id="journal-upload-button">Upload Journal PDF</button>
+      </div>
+
+      <p id="journal-message" class="admin-message" role="status"></p>
+    </form>
+
     <hr>
 
     <h2>Content Management</h2>
     <p class="admin-help">Create and update public workshop themes and modules. Published items appear in the public content API.</p>
     <p id="content-message" class="admin-message" role="status"></p>
+
+    <hr>
 
     <div class="content-admin-grid">
       <form id="theme-form" class="admin-form">
@@ -314,5 +334,6 @@
 
   <script type="module" src="/src/js/admin/dashboard.js"></script>
   <script type="module" src="/src/js/admin/content.js"></script>
+  <script type="module" src="/src/js/admin/journal.js"></script>
 </body>
 </html>

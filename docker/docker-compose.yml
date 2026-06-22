@@ -4,16 +4,16 @@ services:
     container_name: bvom-mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: bvom
-      MYSQL_USER: bvom_user
-      MYSQL_PASSWORD: bvom_pass
-      MYSQL_ROOT_PASSWORD: root_pass_change_me
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "bvom_user", "-pbvom_pass"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "bvom_user", "-p${DB_PASSWORD}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -32,15 +32,15 @@ services:
       PORT: 8080
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_NAME: bvom
-      DB_USER: bvom_user
-      DB_PASSWORD: bvom_pass
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
       CORS_ORIGIN: "http://localhost:5173"
       # CORS_ORIGIN: "http://localhost:5173,${TUNNEL_URL}"
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: change_me_now
-      ADMIN_RECOVERY_KEY: bvom-recovery-2026-x7J9qP2mL8vR4sT6nW3kY1zA
-      SESSION_SECRET: replace_with_a_long_random_secret
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_RECOVERY_KEY: ${ADMIN_RECOVERY_KEY}
+      SESSION_SECRET: ${SESSION_SECRET}
       TEST_DB_HOST: mysql
       TEST_DB_PORT: 3306
     ports:

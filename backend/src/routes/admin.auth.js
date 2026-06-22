@@ -7,6 +7,7 @@ import env from "../config/env.js";
 import { getAdminSessionExpiry, requireAdmin } from "../middleware/auth.js";
 import { adminAuthLimiter } from "../middleware/rateLimit.js";
 import { validate } from "../middleware/validate.js";
+import { uploadJournalPdf } from "../middleware/upload.js";
 
 // IMPORTANT:
 // Change this import to match your actual database file.
@@ -216,5 +217,24 @@ router.get("/me", requireAdmin, (req, res) => {
     admin: req.session.admin
   });
 });
+
+router.post(
+  "/journal",
+  requireAdmin,
+  uploadJournalPdf.single("journalPdf"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({
+        error: "No journal PDF uploaded."
+      });
+    }
+
+    return res.json({
+      ok: true,
+      message: "Journal PDF uploaded successfully.",
+      path: "/uploads/documents/journal.pdf"
+    });
+  }
+);
 
 export default router;
