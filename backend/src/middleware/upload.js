@@ -23,13 +23,17 @@ const videoMimeTypes = new Set([
   "video/ogg"
 ]);
 
+const pdfMimeTypes = new Set([
+  "application/pdf"
+]);
+
 function ensureDirExists(dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 }
 
-function createUpload({ subdir, allowedMimeTypes, errorMessage, maxUploadMb }) {
+function createUpload({ subdir, allowedMimeTypes, errorMessage, maxUploadMb, fixedFilename = null }) {
   const uploadDir = path.join(resolveUploadDir(env.UPLOAD_DIR), subdir);
   ensureDirExists(uploadDir);
 
@@ -38,6 +42,11 @@ function createUpload({ subdir, allowedMimeTypes, errorMessage, maxUploadMb }) {
       cb(null, uploadDir);
     },
     filename(req, file, cb) {
+      if (fixedFilename) {
+        cb(null, fixedFilename);
+        return;
+      }
+
       const ext = path.extname(file.originalname).toLowerCase();
       const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
       cb(null, safeName);
@@ -73,6 +82,14 @@ export const uploadVideo = createUpload({
   allowedMimeTypes: videoMimeTypes,
   errorMessage: "Only MP4, WEBM, MOV, and OGG videos are allowed.",
   maxUploadMb: env.MAX_VIDEO_UPLOAD_MB
+});
+
+export const uploadJournalPdf = createUpload({
+  subdir: "documents",
+  allowedMimeTypes: pdfMimeTypes,
+  errorMessage: "Only PDF files are allowed.",
+  maxUploadMb: env.MAX_UPLOAD_MB,
+  fixedFilename: "journal.pdf"
 });
 
 export { uploadImage };
