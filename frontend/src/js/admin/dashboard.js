@@ -3,6 +3,15 @@ import { getCurrentAdmin, logoutAdmin, scheduleAdminSessionTimeout, redirectToAd
 import { apiFetch } from "../api/client.js";
 import { endpoints } from "../api/endpoints.js";
 
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 async function loadRecentActivities() {
   try {
     const data = await apiFetch(endpoints.adminRecentActivities + "?limit=50");
@@ -31,10 +40,10 @@ async function loadViewsPerPage() {
       .map(
         (row) => `
       <tr>
-        <td>${row.pageTitle || "-"}</td>
-        <td>${row.pagePath}</td>
-        <td>${row.totalViews}</td>
-        <td>${row.uniqueUsers}</td>
+        <td>${escapeHtml(row.pageTitle || "-")}</td>
+        <td>${escapeHtml(row.pagePath)}</td>
+        <td>${escapeHtml(row.totalViews)}</td>
+        <td>${escapeHtml(row.uniqueUsers)}</td>
       </tr>
     `
       )
@@ -82,11 +91,11 @@ function renderActivitiesTable(activities) {
 
       return `
       <tr>
-        <td>${time}</td>
-        <td>${type}</td>
-        <td>${activity.submissionCode || "-"}</td>
-        <td>${activity.cohortCode || "-"}</td>
-        <td>${details}</td>
+        <td>${escapeHtml(time)}</td>
+        <td>${escapeHtml(type)}</td>
+        <td>${escapeHtml(activity.submissionCode || "-")}</td>
+        <td>${escapeHtml(activity.cohortCode || "-")}</td>
+        <td>${escapeHtml(details)}</td>
       </tr>
     `;
     })
@@ -106,9 +115,9 @@ function renderViewsTable(report) {
     .map(
       (day) => `
     <tr>
-      <td>${day.date}</td>
-      <td>${day.totalViews}</td>
-      <td>${day.uniqueUsers}</td>
+      <td>${escapeHtml(day.date)}</td>
+      <td>${escapeHtml(day.totalViews)}</td>
+      <td>${escapeHtml(day.uniqueUsers)}</td>
     </tr>
   `
     )

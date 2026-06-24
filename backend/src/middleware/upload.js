@@ -27,6 +27,18 @@ const pdfMimeTypes = new Set([
   "application/pdf"
 ]);
 
+const extensionsByMimeType = {
+  "image/jpeg": ".jpg",
+  "image/jpg": ".jpg",
+  "image/png": ".png",
+  "image/webp": ".webp",
+  "video/mp4": ".mp4",
+  "video/webm": ".webm",
+  "video/quicktime": ".mov",
+  "video/ogg": ".ogv",
+  "application/pdf": ".pdf"
+};
+
 function ensureDirExists(dir) {
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
@@ -47,7 +59,7 @@ function createUpload({ subdir, allowedMimeTypes, errorMessage, maxUploadMb, fix
         return;
       }
 
-      const ext = path.extname(file.originalname).toLowerCase();
+      const ext = extensionsByMimeType[file.mimetype] || "";
       const safeName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`;
       cb(null, safeName);
     }

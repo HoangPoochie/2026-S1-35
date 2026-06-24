@@ -40,7 +40,7 @@ const env = {
   RATE_LIMIT_MAX: toNumber(process.env.RATE_LIMIT_MAX, 120),
   ADMIN_RATE_LIMIT_MAX: toNumber(process.env.ADMIN_RATE_LIMIT_MAX, 10),
 
-  UPLOAD_DIR: process.env.UPLOAD_DIR,
+  UPLOAD_DIR: process.env.UPLOAD_DIR || "./uploads",
   MAX_UPLOAD_MB: toNumber(process.env.MAX_UPLOAD_MB, 5),
   MAX_VIDEO_UPLOAD_MB: toNumber(process.env.MAX_VIDEO_UPLOAD_MB, 50),
 

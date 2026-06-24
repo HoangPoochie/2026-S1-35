@@ -60,20 +60,38 @@ services:
       - backend
     environment:
       VITE_PROXY_TARGET: "http://backend:8080"
+      VITE_ALLOWED_HOSTS: ${VITE_ALLOWED_HOSTS:-}
     ports:
       - "5173:5173"
     volumes:
       - ../frontend:/app
       - /app/node_modules
 
-  # cloudflared:
-  #   image: cloudflare/cloudflared:latest
-  #   restart: unless-stopped
-  #   command: tunnel --no-autoupdate run
-  #   environment:
-  #     TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
-  #   depends_on:
-  #     - frontend
+  # Free Cloudflare Quick Tunnel - no account or domain needed. Only starts
+  # when requested (see scripts/start-app.sh / start-app.ps1). The public
+  # URL is random and changes every time this container restarts.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: bvom-cloudflared
+    restart: unless-stopped
+    command: tunnel --url http://frontend:5173
+    depends_on:
+      - frontend
+    profiles: ["tunnel"]
+
+  # Named tunnel for a Cloudflare account that owns a real domain. Requires
+  # a tunnel token from the Cloudflare dashboard (CLOUDFLARE_TUNNEL_TOKEN in
+  # docker/.env). Run with: docker compose --profile tunnel-named up
+  cloudflared-named:
+    image: cloudflare/cloudflared:latest
+    container_name: bvom-cloudflared-named
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - frontend
+    profiles: ["tunnel-named"]
 
 volumes:
   mysql_data:
