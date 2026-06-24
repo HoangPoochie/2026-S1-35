@@ -11,11 +11,44 @@ docker -V
 If Docker is not installed, you may install Docker Desktop from: https://www.docker.com/products/docker-desktop/
 
 ## To start the app:
+
+**Windows:** double-click `start.bat`.
+
+**Mac:** double-click `start.command`.
+
+The first run will create `docker/.env` for you, automatically filled in
+with secure random secrets, and print an admin username/password to the
+terminal - write that down, you'll need it to log in. Then it will ask:
+
+> Make this app accessible from other devices over the internet?
+
+This is optional - press Enter/N to skip and only run the app on this
+computer. If you say yes, it uses a free Cloudflare Quick Tunnel (no account
+or domain needed) and prints a public link you can share with someone else
+to try the app remotely. That link stops working once you stop the app (see
+below), and a new (different) link is generated each time you start the app
+and say yes again.
+
+After that, it builds and starts the app. Leave the terminal window open
+while using the app. **Closing the window does not stop the app** - Docker
+keeps it running in the background. To stop it, use `stop.bat` / `stop.command`
+below.
+
+If you'd rather run it manually from a terminal instead of double-clicking:
+
+Mac/Linux:
 ```bash
-cd docker && docker compose up --build
+./scripts/start-app.sh
 ```
 
-The `--build` flag is only needed the first time. After the first time, you can run:
+Windows:
+```powershell
+.\scripts\start-app.ps1
+```
+
+Both scripts create `docker/.env` if it doesn't exist yet, ask about the
+optional Cloudflare Quick Tunnel, then build and start the app. To start
+the app without being asked you can instead run:
 
 ```bash
 cd docker && docker compose up
@@ -25,6 +58,7 @@ cd docker && docker compose up
 
 Once started, the app can then be accessed at:
 - http://localhost:5173
+- Or the Cloudflare URL you are given when running the script with remote access enabled
 
 
 Additionally:
@@ -37,9 +71,19 @@ Vite proxies those requests to the backend service automatically.
 
 ## To stop the app:
 
+**Windows:** double-click `stop.bat`.
+
+**Mac:** double-click `stop.command`.
+
+Or from a terminal:
 ```bash
-cd docker && docker compose down
+cd docker && docker compose --profile tunnel down
 ```
+
+(The `--profile tunnel` part is needed even if you didn't use the remote
+access option, otherwise the tunnel container - if it was started - gets
+left running in the background. `stop.bat`/`stop.command` already handle
+this for you.)
 
 ---
 
@@ -62,6 +106,7 @@ cd docker && docker compose exec backend npm test
 curl http://localhost:8080/health
 ```
 
+```powershell
 # PowerShell
 Invoke-RestMethod http://localhost:8080/health
 ```
@@ -75,15 +120,20 @@ curl http://localhost:8080/api/surveys/wellbeing-check
 
 **Admin login**
 
+Use the admin password printed by the setup script on first run (or whatever
+you've since changed it to from the admin dashboard).
+
 ```bash
 # Bash - saves session cookie to cookies.txt
 curl -i -c cookies.txt \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"change_me_now"}' \
+  -d '{"username":"admin","password":"<your-admin-password>"}' \
   http://localhost:8080/api/admin/login
+```
 
+```powershell
 # PowerShell
-$body = '{"username":"admin","password":"change_me_now"}'
+$body = '{"username":"admin","password":"<your-admin-password>"}'
 Invoke-RestMethod -Method Post http://localhost:8080/api/admin/login \
   -ContentType 'application/json' -Body $body -SessionVariable s
 ```

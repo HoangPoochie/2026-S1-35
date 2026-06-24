@@ -146,3 +146,4 @@ frontend/.env
 node_modules/
 backend/node_modules/
 .env
+cookies.txt
