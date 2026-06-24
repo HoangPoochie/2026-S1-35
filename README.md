@@ -5,7 +5,7 @@
 Everything runs via Docker.
 1. Ensure Docker is installed on your system by opening a terminal and running:
 ```bash
-docker -V
+docker -v
 ```
 
 If Docker is not installed, you may install Docker Desktop from: https://www.docker.com/products/docker-desktop/
